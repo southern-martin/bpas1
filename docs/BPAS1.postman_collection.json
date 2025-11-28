@@ -3,7 +3,7 @@
     "_postman_id": "bpas1-backend-collection",
     "name": "BPAS1 Backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection for BPAS1 backend endpoints (clarify + cards). Uses {{base_url}} (default http://localhost:4000)."
+    "description": "Collection for BPAS1 backend endpoints (clarify, cards, pipeline, planning). Uses {{base_url}} (default http://localhost:4000)."
   },
   "variable": [
     {
@@ -206,6 +206,72 @@
                 "cards",
                 "{{card_id}}",
                 "updates"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pipeline (GET /pipeline)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/pipeline",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pipeline"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Planning",
+      "item": [
+        {
+          "name": "Get Planning (GET /planning)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/planning",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "planning"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Planning Bucket (PATCH /planning/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planning_bucket\": \"Tomorrow\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/planning/{{card_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "planning",
+                "{{card_id}}"
               ]
             }
           },
