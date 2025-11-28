@@ -1,47 +1,117 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable
+} from "react-beautiful-dnd";
 
 export default function OfficePipeline() {
-  const [pipeline, setPipeline] = useState(null);
+  const [pipeline, setPipeline] = useState({
+    to_do: [],
+    doing: [],
+    done: [],
+    blocked: []
+  });
 
   useEffect(() => {
-    async function load() {
-      const res = await api.get("/pipeline");
-      setPipeline(res.data);
-    }
-    load();
+    loadPipeline();
   }, []);
 
-  if (!pipeline) return <p style={{ padding: 20 }}>Loading pipeline…</p>;
+  async function loadPipeline() {
+    const res = await api.get("/pipeline");
+    setPipeline(res.data);
+  }
+
+  async function handleDragEnd(result) {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return;
+
+    const statusMap = {
+      "todo-col": "To Do",
+      "doing-col": "Doing",
+      "done-col": "Done",
+      "blocked-col": "Blocked"
+    };
+
+    const newStatus = statusMap[destination.droppableId];
+
+    await api.patch(`/cards/${draggableId}`, { status: newStatus });
+
+    loadPipeline();
+  }
 
   return (
     <div style={{ padding: 20 }}>
       <h1>Pipeline Board</h1>
 
-      <div className="pipeline-grid">
-        <PipelineColumn title="To Do" cards={pipeline.to_do} />
-        <PipelineColumn title="Doing" cards={pipeline.doing} />
-        <PipelineColumn title="Done / Blocked" cards={[...pipeline.done, ...pipeline.blocked]} />
-      </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="pipeline-grid">
+          <PipelineColumn
+            droppableId="todo-col"
+            title="To Do"
+            cards={pipeline.to_do}
+          />
+          <PipelineColumn
+            droppableId="doing-col"
+            title="Doing"
+            cards={pipeline.doing}
+          />
+          <PipelineColumn
+            droppableId="done-col"
+            title="Done"
+            cards={pipeline.done}
+          />
+          <PipelineColumn
+            droppableId="blocked-col"
+            title="Blocked"
+            cards={pipeline.blocked}
+          />
+        </div>
+      </DragDropContext>
     </div>
   );
 }
 
-function PipelineColumn({ title, cards }) {
+function PipelineColumn({ droppableId, title, cards }) {
   return (
-    <div className="pipeline-column">
-      <h2>{title}</h2>
+    <Droppable droppableId={droppableId}>
+      {provided => (
+        <div
+          className="pipeline-column"
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
+          <h2>{title}</h2>
 
-      {cards.length === 0 && <p className="small">No cards.</p>}
+          {cards.map((card, index) => (
+            <Draggable key={card.id} draggableId={card.id} index={index}>
+              {providedDrag => (
+                <div
+                  className="pipeline-card"
+                  ref={providedDrag.innerRef}
+                  {...providedDrag.draggableProps}
+                  {...providedDrag.dragHandleProps}
+                >
+                  <div className="card-title">{card.title}</div>
+                  <div className="card-subtitle">
+                    {card.type} • {card.linked_client_id || "—"}
+                  </div>
+                </div>
+              )}
+            </Draggable>
+          ))}
 
-      {cards.map(card => (
-        <div key={card.id} className="pipeline-card">
-          <div className="card-title">{card.title}</div>
-          <div className="card-subtitle">
-            {card.type} • {card.linked_client_id || "No Client"}
-          </div>
+          {provided.placeholder}
         </div>
-      ))}
-    </div>
+      )}
+    </Droppable>
   );
 }
