@@ -50,7 +50,7 @@ export default function FieldCard() {
   async function handleStartRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -68,6 +68,14 @@ export default function FieldCard() {
 
       mediaRecorder.start();
       setRecording(true);
+
+      // Auto-stop after 5 seconds for MVP
+      setTimeout(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+          mediaRecorderRef.current.stop();
+          setRecording(false);
+        }
+      }, 5000);
     } catch (err) {
       console.error("Error accessing microphone:", err);
       alert("Could not access microphone.");
