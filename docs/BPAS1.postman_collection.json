@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "bpas1-backend-collection",
+    "name": "BPAS1 Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection for BPAS1 backend endpoints (clarify + cards). Uses {{base_url}} (default http://localhost:4000)."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "card_id",
+      "value": "<replace-with-card-id>"
+    }
+  ],
+  "item": [
+    {
+      "name": "Clarify (POST /clarify)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"raw_text\": \"uh remind John about that thing for Friday maybe\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/clarify",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clarify"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cards",
+      "item": [
+        {
+          "name": "Create Card (POST /cards)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Example test card\",\n  \"type\": \"Task\",\n  \"linked_client_id\": null,\n  \"linked_project_id\": null,\n  \"assigned_to_user_id\": \"staff-1\",\n  \"event_time\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cards",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Cards (GET /cards)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cards",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "To Do",
+                  "disabled": true
+                },
+                {
+                  "key": "assigned_to",
+                  "value": "staff-1",
+                  "disabled": true
+                },
+                {
+                  "key": "client_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "project_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Cards by Staff (GET /cards?assigned_to=staff-1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cards?assigned_to=staff-1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards"
+              ],
+              "query": [
+                {
+                  "key": "assigned_to",
+                  "value": "staff-1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Card Status (PATCH /cards/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Doing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cards/{{card_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards",
+                "{{card_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Card (GET /cards/:id)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cards/{{card_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards",
+                "{{card_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Card Activity (POST /cards/:id/updates)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Done\",\n  \"notes_clarified\": \"Completed installation and QA\",\n  \"user_id\": \"staff-1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cards/{{card_id}}/updates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards",
+                "{{card_id}}",
+                "updates"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
