@@ -1,0 +1,16 @@
+{
+  "name": "bpas-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:ai": "node testAI.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "openai": "^4.56.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
