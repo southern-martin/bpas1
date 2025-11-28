@@ -278,6 +278,39 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Audio",
+      "item": [
+        {
+          "name": "Transcribe Audio (POST /audio/transcribe)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/audio/transcribe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audio",
+                "transcribe"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
