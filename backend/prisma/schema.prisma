@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Card {
+  id                 String    @id @default(uuid())
+  title              String
+  type               String
+  status             String    @default("To Do")
+  linked_client_id   String?
+  linked_project_id  String?
+  assigned_to_user_id String?
+  notes_raw          String?
+  notes_clarified    String?
+  event_time         String?
+  planning_bucket    String?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  activities         Activity[]
+}
+
+model Activity {
+  id           String   @id @default(uuid())
+  card_id      String
+  user_id      String?
+  status_after String?
+  notes_added  String?
+  created_at   DateTime @default(now())
+
+  card Card @relation(fields: [card_id], references: [id])
+}
+
+model Client {
+  id         String   @id @default(uuid())
+  name       String
+  created_at DateTime @default(now())
+}
+
+model Project {
+  id         String   @id @default(uuid())
+  name       String
+  client_id  String
+  created_at DateTime @default(now())
+}
+
+model User {
+  id    String  @id @default(uuid())
+  name  String
+  role  String
+  email String?
+}

@@ -1,8 +1,8 @@
 import * as pipelineService from "../services/pipeline.service.js";
 
-export function getPipeline(req, res) {
+export async function getPipeline(req, res) {
   try {
-    const pipeline = pipelineService.getPipeline();
+    const pipeline = await pipelineService.getPipeline();
     res.json(pipeline);
   } catch (err) {
     console.error("Pipeline Error:", err);

@@ -1,79 +1,64 @@
-import { db } from "../db.js";
-import { v4 as uuid } from "uuid";
+import { prisma } from "../db/prisma.js";
 
-export function createCard(data) {
-  const newCard = {
-    id: uuid(),
-    // Required
-    title: data.title,
-    type: data.type,
-    status: "To Do",
-    // Optional links
-    linked_client_id: data.linked_client_id || null,
-    linked_project_id: data.linked_project_id || null,
-    assigned_to_user_id: data.assigned_to_user_id || null,
-    // Notes
-    notes_raw: "",
-    notes_clarified: "",
-    // Optional event time
-    event_time: data.event_time || null,
-    // Planning bucket (owner planning page)
-    planning_bucket: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
-  db.cards.push(newCard);
-  return newCard;
-}
-
-export function getCards(filters) {
-  return db.cards.filter(card => {
-    if (filters.assigned_to && card.assigned_to_user_id !== filters.assigned_to) return false;
-    if (filters.client_id && card.linked_client_id !== filters.client_id) return false;
-    if (filters.project_id && card.linked_project_id !== filters.project_id) return false;
-    if (filters.status && card.status !== filters.status) return false;
-    if (filters.type && card.type !== filters.type) return false;
-    return true;
+export async function createCard(data) {
+  return prisma.card.create({
+    data: {
+      title: data.title,
+      type: data.type,
+      status: "To Do",
+      linked_client_id: data.linked_client_id || null,
+      linked_project_id: data.linked_project_id || null,
+      assigned_to_user_id: data.assigned_to_user_id || null,
+      notes_raw: "",
+      notes_clarified: "",
+      event_time: data.event_time || null,
+      planning_bucket: null
+    }
   });
 }
 
-export function getCardById(id) {
-  return db.cards.find(card => card.id === id);
+export async function getCards(filters) {
+  return prisma.card.findMany({
+    where: {
+      assigned_to_user_id: filters.assigned_to || undefined,
+      linked_client_id: filters.client_id || undefined,
+      linked_project_id: filters.project_id || undefined,
+      status: filters.status || undefined,
+      type: filters.type || undefined
+    }
+  });
 }
 
-export function updateCard(id, updates) {
-  const card = getCardById(id);
-  if (!card) return null;
-
-  Object.assign(card, updates);
-  card.updated_at = new Date().toISOString();
-
-  return card;
+export async function getCardById(id) {
+  return prisma.card.findUnique({
+    where: { id }
+  });
 }
 
-export function updateCardActivity(id, updates) {
-  const card = getCardById(id);
-  if (!card) return null;
+export async function updateCard(id, updates) {
+  return prisma.card.update({
+    where: { id },
+    data: updates
+  });
+}
 
-  if (updates.status) {
-    card.status = updates.status;
-  }
-
-  if (updates.notes_clarified) {
-    card.notes_clarified = updates.notes_clarified;
-  }
-
-  card.updated_at = new Date().toISOString();
-
-  db.activities.push({
-    id: uuid(),
-    card_id: card.id,
-    user_id: updates.user_id || null,
-    status_after: card.status,
-    notes_added: updates.notes_clarified || "",
-    created_at: new Date().toISOString()
+export async function updateCardActivity(id, updates) {
+  const updatedCard = await prisma.card.update({
+    where: { id },
+    data: {
+      status: updates.status || undefined,
+      notes_clarified: updates.notes_clarified || undefined
+    }
   });
 
-  return card;
+  await prisma.activity.create({
+    data: {
+      card_id: id,
+      user_id: updates.user_id || null,
+      status_after: updates.status || null,
+      notes_added: updates.notes_clarified || null
+    }
+  });
+
+  return updatedCard;
 }

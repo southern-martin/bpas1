@@ -15,3 +15,6 @@ dist
 
 # Temporary uploads
 backend/uploads
+
+# Prisma artifacts
+backend/prisma/dev.db

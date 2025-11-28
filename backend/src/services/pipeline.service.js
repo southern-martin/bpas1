@@ -1,10 +1,10 @@
-import { db } from "../db.js";
+import { prisma } from "../db/prisma.js";
 
-export function getPipeline() {
+export async function getPipeline() {
   return {
-    to_do: db.cards.filter(c => c.status === "To Do"),
-    doing: db.cards.filter(c => c.status === "Doing"),
-    done: db.cards.filter(c => c.status === "Done"),
-    blocked: db.cards.filter(c => c.status === "Blocked")
+    to_do: await prisma.card.findMany({ where: { status: "To Do" } }),
+    doing: await prisma.card.findMany({ where: { status: "Doing" } }),
+    done: await prisma.card.findMany({ where: { status: "Done" } }),
+    blocked: await prisma.card.findMany({ where: { status: "Blocked" } })
   };
 }

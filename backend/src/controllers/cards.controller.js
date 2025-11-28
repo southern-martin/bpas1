@@ -1,8 +1,8 @@
 import * as cardsService from "../services/cards.service.js";
 
-export function createCard(req, res) {
+export async function createCard(req, res) {
   try {
-    const card = cardsService.createCard(req.body);
+    const card = await cardsService.createCard(req.body);
     res.status(201).json(card);
   } catch (err) {
     console.error("Create Card Error:", err);
@@ -10,9 +10,9 @@ export function createCard(req, res) {
   }
 }
 
-export function getCards(req, res) {
+export async function getCards(req, res) {
   try {
-    const result = cardsService.getCards(req.query);
+    const result = await cardsService.getCards(req.query);
     res.json(result);
   } catch (err) {
     console.error("Get Cards Error:", err);
@@ -20,14 +20,19 @@ export function getCards(req, res) {
   }
 }
 
-export function getCardById(req, res) {
-  const card = cardsService.getCardById(req.params.id);
-  card ? res.json(card) : res.status(404).json({ error: "Card not found" });
+export async function getCardById(req, res) {
+  try {
+    const card = await cardsService.getCardById(req.params.id);
+    card ? res.json(card) : res.status(404).json({ error: "Card not found" });
+  } catch (err) {
+    console.error("Get Card Error:", err);
+    res.status(500).json({ error: "Failed to load card" });
+  }
 }
 
-export function updateCard(req, res) {
+export async function updateCard(req, res) {
   try {
-    const updated = cardsService.updateCard(req.params.id, req.body);
+    const updated = await cardsService.updateCard(req.params.id, req.body);
     updated ? res.json(updated) : res.status(404).json({ error: "Card not found" });
   } catch (err) {
     console.error("Update Card Error:", err);
@@ -35,9 +40,9 @@ export function updateCard(req, res) {
   }
 }
 
-export function updateCardActivity(req, res) {
+export async function updateCardActivity(req, res) {
   try {
-    const updated = cardsService.updateCardActivity(req.params.id, req.body);
+    const updated = await cardsService.updateCardActivity(req.params.id, req.body);
     updated ? res.json(updated) : res.status(404).json({ error: "Card not found" });
   } catch (err) {
     console.error("Card Activity Error:", err);
