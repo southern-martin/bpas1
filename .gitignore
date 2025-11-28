@@ -1,0 +1,9 @@
+# macOS artifacts
+.DS_Store
+
+# Environment secrets
+.env
+.env.*
+
+# Node modules
+node_modules
