@@ -116,10 +116,42 @@
           "response": []
         },
         {
-          "name": "Get Card (GET /cards/:id)",
+          "name": "Filter Cards by Staff (GET /cards?assigned_to=staff-1)",
           "request": {
             "method": "GET",
             "header": [],
+            "url": {
+              "raw": "{{base_url}}/cards?assigned_to=staff-1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cards"
+              ],
+              "query": [
+                {
+                  "key": "assigned_to",
+                  "value": "staff-1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Card Status (PATCH /cards/:id)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Doing\"\n}"
+            },
             "url": {
               "raw": "{{base_url}}/cards/{{card_id}}",
               "host": [
@@ -134,19 +166,10 @@
           "response": []
         },
         {
-          "name": "Update Card (PATCH /cards/:id)",
+          "name": "Get Card (GET /cards/:id)",
           "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated card title\",\n  \"status\": \"Doing\",\n  \"assigned_to_user_id\": \"staff-2\"\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/cards/{{card_id}}",
               "host": [
