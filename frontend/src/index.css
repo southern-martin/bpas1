@@ -59,7 +59,7 @@ select {
 .pipeline-grid {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
@@ -68,14 +68,16 @@ select {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 12px;
+  min-height: 400px;
 }
 
 .pipeline-card {
   background: #f9fafb;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 10px;
+  cursor: grab;
 }
 
 .card-title {
