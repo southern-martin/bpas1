@@ -55,3 +55,34 @@ textarea,
 select {
   font-family: inherit;
 }
+
+.pipeline-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.pipeline-column {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.pipeline-card {
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+}
