@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
 
 export default function FieldCard() {
@@ -12,6 +12,10 @@ export default function FieldCard() {
   const [rawNotes, setRawNotes] = useState("");
   const [clarifiedNotes, setClarifiedNotes] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
 
   useEffect(() => {
     async function load() {
@@ -41,6 +45,57 @@ export default function FieldCard() {
 
     setSaving(false);
     navigate("/field/today");
+  }
+
+  async function handleStartRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        await sendAudioToBackend(blob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setRecording(true);
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+      alert("Could not access microphone.");
+    }
+  }
+
+  async function handleStopRecording() {
+    if (mediaRecorderRef.current && recording) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  }
+
+  async function sendAudioToBackend(blob) {
+    try {
+      const formData = new FormData();
+      formData.append("audio", blob, "recording.webm");
+
+      const res = await api.post("/audio/transcribe", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      const newText = res.data.raw_text || "";
+      setRawNotes(prev => (prev ? `${prev}\n${newText}` : newText));
+    } catch (err) {
+      console.error("Transcription upload error:", err);
+      alert("Failed to transcribe audio.");
+    }
   }
 
   if (!card) return <p>Loading…</p>;
@@ -77,10 +132,16 @@ export default function FieldCard() {
         />
 
         <div style={{ marginTop: 10 }}>
-          <button onClick={() => alert("Recording stub (add later)")}>🎤 Record</button>
+          {!recording ? (
+            <button onClick={handleStartRecording}>🎤 Start Recording</button>
+          ) : (
+            <button onClick={handleStopRecording}>⏹ Stop Recording</button>
+          )}
+
           <button onClick={handleClarify} style={{ marginLeft: 10 }}>
             ✨ Clarify
           </button>
+
           <button
             onClick={() => {
               setRawNotes("");
