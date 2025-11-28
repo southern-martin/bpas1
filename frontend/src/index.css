@@ -86,3 +86,35 @@ select {
   font-size: 12px;
   color: #6b7280;
 }
+
+.planning-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.planning-column {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.planning-card {
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.move-buttons button {
+  margin-top: 6px;
+  margin-right: 6px;
+}
+
+.clear-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
