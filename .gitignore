@@ -4,6 +4,8 @@
 # Environment secrets
 .env
 .env.*
+.env*.key
+*.pem
 
 # Node modules
 node_modules
