@@ -18,6 +18,7 @@ export default function OfficePipeline() {
   const [projects, setProjects] = useState([]);
   const [clientFilter, setClientFilter] = useState("");
   const [projectFilter, setProjectFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadPipeline();
@@ -59,6 +60,8 @@ export default function OfficePipeline() {
     return cards.filter(card => {
       if (clientFilter && card.linked_client_id !== clientFilter) return false;
       if (projectFilter && card.linked_project_id !== projectFilter) return false;
+      if (searchTerm && !card.title.toLowerCase().includes(searchTerm.toLowerCase()))
+        return false;
       return true;
     });
   }
@@ -72,6 +75,14 @@ export default function OfficePipeline() {
       <h1>Pipeline Board</h1>
 
       <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Search cards..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+
         <select value={clientFilter} onChange={e => setClientFilter(e.target.value)}>
           <option value="">All Clients</option>
           {clients.map(c => (
