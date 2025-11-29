@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { api } from "../api/client.js";
 
@@ -8,18 +8,24 @@ export default function OwnerCardDetails() {
   const [card, setCard] = useState(null);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [staffList, setStaffList] = useState([]);
   const [status, setStatus] = useState("To Do");
 
+  const load = useCallback(async () => {
+    const res = await api.get(`/cards/${id}`);
+    setCard(res.data);
+    setStatus(res.data.status);
+  }, [id]);
+
   useEffect(() => {
-    async function load() {
-      const res = await api.get(`/cards/${id}`);
-      setCard(res.data);
-      setStatus(res.data.status);
-    }
+    load();
     api.get("/clients").then(r => setClients(r.data));
     api.get("/projects").then(r => setProjects(r.data));
-    load();
-  }, [id]);
+    api.get("/users").then(r => {
+      const staffOnly = (r.data || []).filter(u => u.role === "Staff");
+      setStaffList(staffOnly);
+    });
+  }, [load, id]);
 
   if (!card) return <p style={{ padding: 20 }}>Loading…</p>;
 
@@ -73,6 +79,25 @@ export default function OwnerCardDetails() {
           {projects.map(p => (
             <option key={p.id} value={p.id}>
               {p.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ marginTop: 20 }}>
+        <h2>Assigned Staff</h2>
+        <select
+          className="select-staff"
+          value={card.assigned_to_user_id || ""}
+          onChange={async e => {
+            await api.patch(`/cards/${id}`, { assigned_to_user_id: e.target.value || null });
+            load();
+          }}
+        >
+          <option value="">Unassigned</option>
+          {staffList.map(s => (
+            <option key={s.id} value={s.id}>
+              {s.name}
             </option>
           ))}
         </select>
