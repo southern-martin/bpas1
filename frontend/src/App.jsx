@@ -10,6 +10,7 @@ import ClientView from "./pages/ClientView.jsx";
 import ProjectView from "./pages/ProjectView.jsx";
 import Login from "./pages/Login.jsx";
 import CreateCard from "./pages/CreateCard.jsx";
+import OwnerDashboard from "./pages/OwnerDashboard.jsx";
 import { Link } from "react-router-dom";
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/field/today" element={<FieldToday />} />
         <Route path="/field/card/:id" element={<FieldCard />} />
         <Route path="/office/pipeline" element={<OfficePipeline />} />
+        <Route path="/office/dashboard" element={<OwnerDashboard />} />
         <Route path="/office/planning" element={<OwnerPlanning />} />
         <Route path="/office/clients" element={<Clients />} />
         <Route path="/office/projects" element={<Projects />} />

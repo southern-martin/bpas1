@@ -376,6 +376,59 @@ select {
   font-size: 14px;
 }
 
+.stats-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  flex: 1 1 150px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.dash-card {
+  background: #ffffff;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.dash-line {
+  padding: 6px 0;
+}
+
+.quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-btn {
+  background: #2563eb;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  flex: 1 1 calc(33% - 10px);
+  text-align: center;
+}
+
 .planning-grid {
   margin-top: 20px;
   display: grid;

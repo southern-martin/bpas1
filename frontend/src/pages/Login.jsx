@@ -11,7 +11,7 @@ export default function Login() {
     localStorage.setItem("token", res.data.token);
     localStorage.setItem("role", res.data.user.role);
     localStorage.setItem("userId", res.data.user.id);
-    window.location.href = "/office/pipeline";
+    window.location.href = "/office/dashboard";
   }
 
   async function handleStaffLogin() {
