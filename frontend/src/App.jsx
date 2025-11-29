@@ -9,6 +9,7 @@ import OwnerCardDetails from "./pages/OwnerCardDetails.jsx";
 import ClientView from "./pages/ClientView.jsx";
 import ProjectView from "./pages/ProjectView.jsx";
 import Login from "./pages/Login.jsx";
+import CreateCard from "./pages/CreateCard.jsx";
 import { Link } from "react-router-dom";
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/office/card/:id" element={<OwnerCardDetails />} />
         <Route path="/office/client/:id" element={<ClientView />} />
         <Route path="/office/project/:id" element={<ProjectView />} />
+        <Route path="/office/create-card" element={<CreateCard />} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </>
