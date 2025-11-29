@@ -8,8 +8,10 @@ import {
   upsertClients,
   upsertProjects,
   getClientsFromCache,
-  getProjectsFromCache
+  getProjectsFromCache,
+  getQueueCount
 } from "../offline/db.js";
+import { initSyncLoop } from "../offline/sync.js";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -28,6 +30,7 @@ export default function FieldCard() {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const [offline, setOffline] = useState(!navigator.onLine);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     loadCard();
@@ -37,9 +40,13 @@ export default function FieldCard() {
     const handler = () => setOffline(!navigator.onLine);
     window.addEventListener("online", handler);
     window.addEventListener("offline", handler);
+    initSyncLoop();
+    const queueInterval = setInterval(updateQueueCount, 4000);
+    updateQueueCount();
     return () => {
       window.removeEventListener("online", handler);
       window.removeEventListener("offline", handler);
+      clearInterval(queueInterval);
     };
   }, []);
 
@@ -73,6 +80,11 @@ export default function FieldCard() {
         setClarifiedNotes(cached.notes_clarified || "");
       }
     }
+  }
+
+  async function updateQueueCount() {
+    const count = await getQueueCount();
+    setPendingCount(count);
   }
 
   async function handleClarify() {
@@ -189,7 +201,11 @@ export default function FieldCard() {
     <div className="field-container">
       <div className="page-header">
         <h1>{card.title}</h1>
-        {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
+        {offline && (
+          <div className="offline-banner">
+            Offline — changes will sync when online{pendingCount ? ` (${pendingCount} pending)` : ""}
+          </div>
+        )}
       </div>
 
       <p>Client: {clientName}</p>

@@ -63,3 +63,7 @@ export async function getProjectsFromCache() {
 export async function getActivitiesForCard(cardId) {
   return db.activities.where("card_id").equals(cardId).sortBy("created_at");
 }
+
+export async function getQueueCount() {
+  return db.queue.count();
+}
