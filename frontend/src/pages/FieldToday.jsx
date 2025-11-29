@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function FieldToday() {
   const [events, setEvents] = useState([]);
   const [tasks, setTasks] = useState([]);
 
-  const staffId = "staff-1"; // TODO: replace with real auth/user context
-
   useEffect(() => {
     async function load() {
-      const res = await api.get("/cards", {
-        params: { assigned_to: staffId }
-      });
+      const res = await api.get("/cards");
 
       const all = res.data || [];
 
@@ -22,6 +18,10 @@ export default function FieldToday() {
 
     load();
   }, []);
+
+  if (localStorage.getItem("role") !== "Staff") {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div style={{ padding: 20 }}>

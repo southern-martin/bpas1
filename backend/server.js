@@ -9,6 +9,7 @@ import audioRoutes from "./src/routes/audio.routes.js";
 import clientsRoutes from "./src/routes/clients.routes.js";
 import projectsRoutes from "./src/routes/projects.routes.js";
 import usersRoutes from "./src/routes/users.routes.js";
+import authRoutes from "./src/routes/auth.routes.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use("/audio", audioRoutes);
 app.use("/clients", clientsRoutes);
 app.use("/projects", projectsRoutes);
 app.use("/users", usersRoutes);
+app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("BPAS 1 Backend + OpenAI connection is working");

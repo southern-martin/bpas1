@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
 
@@ -22,6 +22,10 @@ export default function ClientView() {
 
   function groupCards(status) {
     return cards.filter(c => c.status === status);
+  }
+
+  if (localStorage.getItem("role") !== "Owner") {
+    return <Navigate to="/login" replace />;
   }
 
   if (!client) return <p style={{ padding: 20 }}>Loading...</p>;

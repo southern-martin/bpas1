@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { api } from "../api/client.js";
@@ -39,6 +39,9 @@ export default function OwnerCardDetails() {
   }
 
   return (
+    localStorage.getItem("role") !== "Owner" ? (
+      <Navigate to="/login" replace />
+    ) : (
     <div style={{ padding: 20 }}>
       <h1>{card.title}</h1>
 
@@ -165,5 +168,6 @@ export default function OwnerCardDetails() {
         </div>
       </div>
     </div>
+    )
   );
 }

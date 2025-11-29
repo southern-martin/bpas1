@@ -5,6 +5,7 @@ import {
   Droppable,
   Draggable
 } from "react-beautiful-dnd";
+import { Navigate } from "react-router-dom";
 
 export default function OfficePipeline() {
   const [pipeline, setPipeline] = useState({
@@ -60,6 +61,10 @@ export default function OfficePipeline() {
       if (projectFilter && card.linked_project_id !== projectFilter) return false;
       return true;
     });
+  }
+
+  if (localStorage.getItem("role") !== "Owner") {
+    return <Navigate to="/login" replace />;
   }
 
   return (

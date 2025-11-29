@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function Clients() {
@@ -30,6 +30,10 @@ export default function Clients() {
   async function deleteClient(id) {
     await api.delete(`/clients/${id}`);
     load();
+  }
+
+  if (localStorage.getItem("role") !== "Owner") {
+    return <Navigate to="/login" replace />;
   }
 
   return (

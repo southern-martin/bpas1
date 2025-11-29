@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
+import { Navigate } from "react-router-dom";
 
 export default function OwnerPlanning() {
   const [buckets, setBuckets] = useState(null);
@@ -21,6 +22,10 @@ export default function OwnerPlanning() {
   useEffect(() => {
     loadPlanning();
   }, []);
+
+  if (localStorage.getItem("role") !== "Owner") {
+    return <Navigate to="/login" replace />;
+  }
 
   if (loading) return <p style={{ padding: 20 }}>Loading planning…</p>;
 

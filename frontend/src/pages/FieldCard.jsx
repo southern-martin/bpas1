@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
 
@@ -104,6 +104,10 @@ export default function FieldCard() {
       console.error("Transcription upload error:", err);
       alert("Failed to transcribe audio.");
     }
+  }
+
+  if (localStorage.getItem("role") !== "Staff") {
+    return <Navigate to="/login" replace />;
   }
 
   if (!card) return <p>Loading…</p>;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, Navigate } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function ProjectView() {
@@ -26,6 +26,10 @@ export default function ProjectView() {
 
   function groupCards(status) {
     return cards.filter(c => c.status === status);
+  }
+
+  if (localStorage.getItem("role") !== "Owner") {
+    return <Navigate to="/login" replace />;
   }
 
   if (!project) return <p style={{ padding: 20 }}>Loading…</p>;
