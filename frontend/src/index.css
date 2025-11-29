@@ -24,6 +24,10 @@ body {
   font-weight: 600;
 }
 
+.top-nav a:nth-child(n + 5) {
+  margin-left: auto;
+}
+
 h1,
 h2,
 h3 {
