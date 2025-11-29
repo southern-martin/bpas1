@@ -5,10 +5,20 @@ import { api } from "../api/client.js";
 export default function FieldToday() {
   const [events, setEvents] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstall, setShowInstall] = useState(false);
   const staffId = localStorage.getItem("userId") || "staff-1";
 
   useEffect(() => {
     load();
+
+    const handler = e => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstall(true);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
   async function load() {
@@ -49,6 +59,22 @@ export default function FieldToday() {
           <Link className="open-btn" to={`/field/card/${task.id}`}>Open</Link>
         </div>
       ))}
+
+      {showInstall && (
+        <button
+          className="install-btn"
+          onClick={async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            if (choice.outcome === "accepted") console.log("PWA Installed");
+            setDeferredPrompt(null);
+            setShowInstall(false);
+          }}
+        >
+          Install App
+        </button>
+      )}
     </div>
   );
 }
