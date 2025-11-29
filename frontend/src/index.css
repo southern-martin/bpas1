@@ -192,6 +192,13 @@ select {
   margin-right: 6px;
 }
 
+.select-staff {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
 .planning-grid {
   margin-top: 20px;
   display: grid;
