@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function Projects() {
@@ -71,10 +72,7 @@ export default function Projects() {
           {projects.map(p => (
             <tr key={p.id}>
               <td>
-                <input
-                  value={p.name}
-                  onChange={e => updateProject(p.id, "name", e.target.value)}
-                />
+                <Link to={`/office/project/${p.id}`}>{p.name}</Link>
               </td>
               <td>
                 <select
@@ -87,6 +85,12 @@ export default function Projects() {
                     </option>
                   ))}
                 </select>
+              </td>
+              <td>
+                <input
+                  value={p.name}
+                  onChange={e => updateProject(p.id, "name", e.target.value)}
+                />
               </td>
               <td>
                 <button onClick={() => deleteProject(p.id)}>Delete</button>
