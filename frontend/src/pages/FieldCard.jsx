@@ -1,7 +1,17 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
-import { enqueue, getCardFromCache, upsertCards } from "../offline/db.js";
+import {
+  enqueue,
+  getCardFromCache,
+  upsertCards,
+  upsertClients,
+  upsertProjects,
+  getClientsFromCache,
+  getProjectsFromCache,
+  getQueueCount
+} from "../offline/db.js";
+import { initSyncLoop } from "../offline/sync.js";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -9,6 +19,8 @@ export default function FieldCard() {
 
   const [card, setCard] = useState(null);
   const [status, setStatus] = useState("To Do");
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
 
   const [rawNotes, setRawNotes] = useState("");
   const [clarifiedNotes, setClarifiedNotes] = useState("");
@@ -18,6 +30,7 @@ export default function FieldCard() {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const [offline, setOffline] = useState(!navigator.onLine);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     loadCard();
@@ -27,14 +40,27 @@ export default function FieldCard() {
     const handler = () => setOffline(!navigator.onLine);
     window.addEventListener("online", handler);
     window.addEventListener("offline", handler);
+    initSyncLoop();
+    const queueInterval = setInterval(updateQueueCount, 4000);
+    updateQueueCount();
     return () => {
       window.removeEventListener("online", handler);
       window.removeEventListener("offline", handler);
+      clearInterval(queueInterval);
     };
   }, []);
 
   async function loadCard() {
     try {
+      const [clientsRes, projectsRes] = await Promise.all([
+        api.get("/clients"),
+        api.get("/projects")
+      ]);
+      await upsertClients(clientsRes.data);
+      await upsertProjects(projectsRes.data);
+      setClients(clientsRes.data);
+      setProjects(projectsRes.data);
+
       const res = await api.get(`/cards/${id}`);
       const c = res.data;
       setCard(c);
@@ -42,6 +68,11 @@ export default function FieldCard() {
       setClarifiedNotes(c.notes_clarified || "");
       await upsertCards([c]);
     } catch (err) {
+      const cachedClients = await getClientsFromCache();
+      const cachedProjects = await getProjectsFromCache();
+      if (cachedClients.length) setClients(cachedClients);
+      if (cachedProjects.length) setProjects(cachedProjects);
+
       const cached = await getCardFromCache(id);
       if (cached) {
         setCard(cached);
@@ -49,6 +80,11 @@ export default function FieldCard() {
         setClarifiedNotes(cached.notes_clarified || "");
       }
     }
+  }
+
+  async function updateQueueCount() {
+    const count = await getQueueCount();
+    setPendingCount(count);
   }
 
   async function handleClarify() {
@@ -156,15 +192,24 @@ export default function FieldCard() {
 
   if (!card) return <p>Loading…</p>;
 
+  const clientName =
+    clients.find(c => c.id === card.linked_client_id)?.name || "—";
+  const projectName =
+    projects.find(p => p.id === card.linked_project_id)?.name || "—";
+
   return (
     <div className="field-container">
       <div className="page-header">
         <h1>{card.title}</h1>
-        {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
+        {offline && (
+          <div className="offline-banner">
+            Offline — changes will sync when online{pendingCount ? ` (${pendingCount} pending)` : ""}
+          </div>
+        )}
       </div>
 
-      <p>Client: {card.linked_client_id || "—"}</p>
-      <p>Project: {card.linked_project_id || "—"}</p>
+      <p>Client: {clientName}</p>
+      <p>Project: {projectName}</p>
 
       <div className="status-row">
         <label>Status</label>

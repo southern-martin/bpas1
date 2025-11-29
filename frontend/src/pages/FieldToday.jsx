@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { api } from "../api/client.js";
-import { upsertCards, getCardsFromCache } from "../offline/db.js";
+import {
+  upsertCards,
+  getCardsFromCache,
+  upsertClients,
+  upsertProjects,
+  getQueueCount
+} from "../offline/db.js";
 import { initSyncLoop } from "../offline/sync.js";
 
 export default function FieldToday() {
@@ -10,6 +16,7 @@ export default function FieldToday() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstall, setShowInstall] = useState(false);
   const [offline, setOffline] = useState(!navigator.onLine);
+  const [pendingCount, setPendingCount] = useState(0);
   const staffId = localStorage.getItem("userId") || "staff-1";
 
   useEffect(() => {
@@ -25,15 +32,26 @@ export default function FieldToday() {
     window.addEventListener("online", onlineHandler);
     window.addEventListener("offline", onlineHandler);
     initSyncLoop();
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    const queueInterval = setInterval(updateQueueCount, 4000);
+    updateQueueCount();
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("online", onlineHandler);
+      window.removeEventListener("offline", onlineHandler);
+      clearInterval(queueInterval);
+    };
   }, []);
 
   async function load() {
     try {
-      const res = await api.get("/cards", {
-        params: { assigned_to: staffId }
-      });
-      const list = res.data || [];
+      const [cardsRes, clientsRes, projectsRes] = await Promise.all([
+        api.get("/cards", { params: { assigned_to: staffId } }),
+        api.get("/clients"),
+        api.get("/projects")
+      ]);
+      const list = cardsRes.data || [];
+      await upsertClients(clientsRes.data || []);
+      await upsertProjects(projectsRes.data || []);
       await upsertCards(list);
       updateLists(list);
     } catch (err) {
@@ -49,6 +67,11 @@ export default function FieldToday() {
     setTasks(list.filter(c => c.type === "Task" && c.status !== "Done"));
   }
 
+  async function updateQueueCount() {
+    const count = await getQueueCount();
+    setPendingCount(count);
+  }
+
   if (localStorage.getItem("role") !== "Staff") {
     return <Navigate to="/login" replace />;
   }
@@ -57,7 +80,11 @@ export default function FieldToday() {
     <div className="field-container">
       <div className="page-header">
         <h1>Today</h1>
-        {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
+        {offline && (
+          <div className="offline-banner">
+            Offline — changes will sync when online{pendingCount ? ` (${pendingCount} pending)` : ""}
+          </div>
+        )}
       </div>
 
       <h2 className="section-title">Events</h2>

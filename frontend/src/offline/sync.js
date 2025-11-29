@@ -10,7 +10,8 @@ export async function processQueue() {
       await removeQueue(item.id);
     } catch (err) {
       console.error("Sync failed for item", item.id, err);
-      break;
+      // continue to next item to avoid blocking the queue if one fails
+      continue;
     }
   }
 }
