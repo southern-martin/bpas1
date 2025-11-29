@@ -12,6 +12,7 @@ import Login from "./pages/Login.jsx";
 import CreateCard from "./pages/CreateCard.jsx";
 import OwnerDashboard from "./pages/OwnerDashboard.jsx";
 import { Link } from "react-router-dom";
+import OfficeLayout from "./layouts/OfficeLayout.jsx";
 
 export default function App() {
   return (
@@ -40,15 +41,80 @@ export default function App() {
         <Route path="/" element={<FieldToday />} />
         <Route path="/field/today" element={<FieldToday />} />
         <Route path="/field/card/:id" element={<FieldCard />} />
-        <Route path="/office/pipeline" element={<OfficePipeline />} />
-        <Route path="/office/dashboard" element={<OwnerDashboard />} />
-        <Route path="/office/planning" element={<OwnerPlanning />} />
-        <Route path="/office/clients" element={<Clients />} />
-        <Route path="/office/projects" element={<Projects />} />
-        <Route path="/office/card/:id" element={<OwnerCardDetails />} />
-        <Route path="/office/client/:id" element={<ClientView />} />
-        <Route path="/office/project/:id" element={<ProjectView />} />
-        <Route path="/office/create-card" element={<CreateCard />} />
+
+        <Route
+          path="/office/pipeline"
+          element={
+            <OfficeLayout>
+              <OfficePipeline />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/dashboard"
+          element={
+            <OfficeLayout>
+              <OwnerDashboard />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/planning"
+          element={
+            <OfficeLayout>
+              <OwnerPlanning />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/clients"
+          element={
+            <OfficeLayout>
+              <Clients />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/projects"
+          element={
+            <OfficeLayout>
+              <Projects />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/card/:id"
+          element={
+            <OfficeLayout>
+              <OwnerCardDetails />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/client/:id"
+          element={
+            <OfficeLayout>
+              <ClientView />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/project/:id"
+          element={
+            <OfficeLayout>
+              <ProjectView />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/create-card"
+          element={
+            <OfficeLayout>
+              <CreateCard />
+            </OfficeLayout>
+          }
+        />
+
         <Route path="/login" element={<Login />} />
       </Routes>
     </>
