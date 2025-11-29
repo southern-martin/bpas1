@@ -21,7 +21,6 @@ export default function FieldCard() {
     async function load() {
       const res = await api.get(`/cards/${id}`);
       const c = res.data;
-
       setCard(c);
       setStatus(c.status);
       setClarifiedNotes(c.notes_clarified || "");
@@ -40,7 +39,7 @@ export default function FieldCard() {
     await api.post(`/cards/${id}/updates`, {
       status,
       notes_clarified: clarifiedNotes,
-      user_id: "staff-1"
+      user_id: localStorage.getItem("userId") || "staff-1"
     });
 
     setSaving(false);
@@ -69,7 +68,6 @@ export default function FieldCard() {
       mediaRecorder.start();
       setRecording(true);
 
-      // Auto-stop after 5 seconds for MVP
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
           mediaRecorderRef.current.stop();
@@ -113,71 +111,70 @@ export default function FieldCard() {
   if (!card) return <p>Loading…</p>;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>{card.title}</h1>
+    <div className="field-container">
+      <div className="page-header">
+        <h1>{card.title}</h1>
+      </div>
 
       <p>Client: {card.linked_client_id || "—"}</p>
       <p>Project: {card.linked_project_id || "—"}</p>
 
-      <div style={{ marginTop: 20 }}>
-        <strong>Status:</strong>
+      <div className="status-row">
+        <label>Status</label>
         <select
-          style={{ marginLeft: 10 }}
+          className="status-select"
           value={status}
           onChange={e => setStatus(e.target.value)}
         >
           <option>To Do</option>
           <option>Doing</option>
-          <option>Done</option>
           <option>Blocked</option>
+          <option>Done</option>
         </select>
       </div>
 
-      <div className="card clarify-panel" style={{ marginTop: 20, padding: 20 }}>
-        <h2>Notes</h2>
-
-        <textarea
-          value={rawNotes}
-          onChange={e => setRawNotes(e.target.value)}
-          placeholder="Speak or type your notes here..."
-          style={{ width: "100%", height: 100 }}
-        />
-
-        <div style={{ marginTop: 10 }}>
-          {!recording ? (
-            <button onClick={handleStartRecording}>🎤 Start Recording</button>
-          ) : (
-            <button onClick={handleStopRecording}>⏹ Stop Recording</button>
-          )}
-
-          <button onClick={handleClarify} style={{ marginLeft: 10 }}>
-            ✨ Clarify
+      <div className="button-row">
+        {!recording ? (
+          <button className="record-btn" onClick={handleStartRecording}>
+            🎤 Record
           </button>
-
-          <button
-            onClick={() => {
-              setRawNotes("");
-              setClarifiedNotes("");
-            }}
-            style={{ marginLeft: 10 }}
-          >
-            🗑 Clear
+        ) : (
+          <button className="stop-btn" onClick={handleStopRecording}>
+            ⏹ Stop
           </button>
-        </div>
+        )}
 
-        <h3 style={{ marginTop: 20 }}>Clarified Version</h3>
-
-        <textarea
-          value={clarifiedNotes}
-          onChange={e => setClarifiedNotes(e.target.value)}
-          style={{ width: "100%", height: 100 }}
-          placeholder="Clarified notes will appear here..."
-        />
-
-        <button onClick={handleSave} disabled={saving} style={{ marginTop: 20 }}>
-          {saving ? "Saving…" : "💾 Save to System"}
+        <button className="clarify-btn" onClick={handleClarify}>
+          ✨ Clarify
+        </button>
+        <button
+          className="clear-btn"
+          onClick={() => {
+            setRawNotes("");
+            setClarifiedNotes("");
+          }}
+        >
+          🗑 Clear
         </button>
       </div>
+
+      <textarea
+        className="notes-input"
+        value={rawNotes}
+        onChange={e => setRawNotes(e.target.value)}
+        placeholder="Speak or type your notes..."
+      />
+
+      <textarea
+        className="notes-clarified"
+        value={clarifiedNotes}
+        onChange={e => setClarifiedNotes(e.target.value)}
+        placeholder="Clarified notes appear here..."
+      />
+
+      <button className="save-btn" onClick={handleSave} disabled={saving}>
+        {saving ? "Saving…" : "💾 Save"}
+      </button>
     </div>
   );
 }
