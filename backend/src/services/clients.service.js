@@ -16,6 +16,13 @@ export function getClientById(id) {
   });
 }
 
+export function getClientCards(id) {
+  return prisma.card.findMany({
+    where: { linked_client_id: id },
+    orderBy: { created_at: "desc" }
+  });
+}
+
 export async function updateClient(id, data) {
   const exists = await prisma.client.findUnique({ where: { id } });
   if (!exists) return null;
