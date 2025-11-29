@@ -36,7 +36,18 @@ export default function ProjectView() {
 
   return (
     <div style={{ padding: 20 }}>
-      <button onClick={() => navigate(-1)}>← Back</button>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={() => navigate(-1)}>← Back</button>
+        <button
+          onClick={() =>
+            navigate(
+              `/office/create-card?project=${project.id}&client=${project.client_id}`
+            )
+          }
+        >
+          + Create Card
+        </button>
+      </div>
 
       <h1>{project.name}</h1>
 

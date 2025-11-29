@@ -5,7 +5,7 @@ import {
   Droppable,
   Draggable
 } from "react-beautiful-dnd";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 export default function OfficePipeline() {
   const [pipeline, setPipeline] = useState({
@@ -73,6 +73,9 @@ export default function OfficePipeline() {
   return (
     <div style={{ padding: 20 }}>
       <h1>Pipeline Board</h1>
+      <div style={{ marginBottom: 10 }}>
+        <Link to="/office/create-card">+ Create Card</Link>
+      </div>
 
       <div className="filter-bar">
         <input

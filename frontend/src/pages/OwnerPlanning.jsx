@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 export default function OwnerPlanning() {
   const [buckets, setBuckets] = useState(null);
@@ -37,6 +37,9 @@ export default function OwnerPlanning() {
     <div style={{ padding: 20 }}>
       <h1>Owner Planning</h1>
       <p className="small">Arrange cards into Tomorrow, Next Week, and Later.</p>
+      <div style={{ marginBottom: 10 }}>
+        <Link to="/office/create-card">+ Create Card</Link>
+      </div>
 
       <div style={{ marginBottom: 12 }}>
         <input

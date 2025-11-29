@@ -33,6 +33,9 @@ export default function ClientView() {
   return (
     <div style={{ padding: 20 }}>
       <button onClick={() => navigate(-1)}>← Back</button>
+      <button onClick={() => navigate(`/office/create-card?client=${client.id}`)} style={{ marginLeft: 8 }}>
+        + Create Card
+      </button>
 
       <h1>{client.name}</h1>
       <p>{cards.length} card(s)</p>
