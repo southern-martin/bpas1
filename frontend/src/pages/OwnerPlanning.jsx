@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 export default function OwnerPlanning() {
   const [buckets, setBuckets] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   async function loadPlanning() {
     const res = await api.get("/planning");
@@ -29,15 +30,36 @@ export default function OwnerPlanning() {
 
   if (loading) return <p style={{ padding: 20 }}>Loading planning…</p>;
 
+  const applySearch = cards =>
+    cards.filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Owner Planning</h1>
       <p className="small">Arrange cards into Tomorrow, Next Week, and Later.</p>
 
+      <div style={{ marginBottom: 12 }}>
+        <input
+          type="text"
+          placeholder="Search cards..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
       <div className="planning-grid">
-        <PlanningColumn title="Tomorrow" cards={buckets.tomorrow} moveCard={moveCard} />
-        <PlanningColumn title="Next Week" cards={buckets.next_week} moveCard={moveCard} />
-        <PlanningColumn title="Later" cards={buckets.later} moveCard={moveCard} />
+        <PlanningColumn
+          title="Tomorrow"
+          cards={applySearch(buckets.tomorrow)}
+          moveCard={moveCard}
+        />
+        <PlanningColumn
+          title="Next Week"
+          cards={applySearch(buckets.next_week)}
+          moveCard={moveCard}
+        />
+        <PlanningColumn title="Later" cards={applySearch(buckets.later)} moveCard={moveCard} />
       </div>
     </div>
   );
