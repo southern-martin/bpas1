@@ -1,7 +1,15 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
-import { enqueue, getCardFromCache, upsertCards } from "../offline/db.js";
+import {
+  enqueue,
+  getCardFromCache,
+  upsertCards,
+  upsertClients,
+  upsertProjects,
+  getClientsFromCache,
+  getProjectsFromCache
+} from "../offline/db.js";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -9,6 +17,8 @@ export default function FieldCard() {
 
   const [card, setCard] = useState(null);
   const [status, setStatus] = useState("To Do");
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
 
   const [rawNotes, setRawNotes] = useState("");
   const [clarifiedNotes, setClarifiedNotes] = useState("");
@@ -35,6 +45,15 @@ export default function FieldCard() {
 
   async function loadCard() {
     try {
+      const [clientsRes, projectsRes] = await Promise.all([
+        api.get("/clients"),
+        api.get("/projects")
+      ]);
+      await upsertClients(clientsRes.data);
+      await upsertProjects(projectsRes.data);
+      setClients(clientsRes.data);
+      setProjects(projectsRes.data);
+
       const res = await api.get(`/cards/${id}`);
       const c = res.data;
       setCard(c);
@@ -42,6 +61,11 @@ export default function FieldCard() {
       setClarifiedNotes(c.notes_clarified || "");
       await upsertCards([c]);
     } catch (err) {
+      const cachedClients = await getClientsFromCache();
+      const cachedProjects = await getProjectsFromCache();
+      if (cachedClients.length) setClients(cachedClients);
+      if (cachedProjects.length) setProjects(cachedProjects);
+
       const cached = await getCardFromCache(id);
       if (cached) {
         setCard(cached);
@@ -156,6 +180,11 @@ export default function FieldCard() {
 
   if (!card) return <p>Loading…</p>;
 
+  const clientName =
+    clients.find(c => c.id === card.linked_client_id)?.name || "—";
+  const projectName =
+    projects.find(p => p.id === card.linked_project_id)?.name || "—";
+
   return (
     <div className="field-container">
       <div className="page-header">
@@ -163,8 +192,8 @@ export default function FieldCard() {
         {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
       </div>
 
-      <p>Client: {card.linked_client_id || "—"}</p>
-      <p>Project: {card.linked_project_id || "—"}</p>
+      <p>Client: {clientName}</p>
+      <p>Project: {projectName}</p>
 
       <div className="status-row">
         <label>Status</label>

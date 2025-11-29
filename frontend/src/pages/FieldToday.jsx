@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { api } from "../api/client.js";
-import { upsertCards, getCardsFromCache } from "../offline/db.js";
+import {
+  upsertCards,
+  getCardsFromCache,
+  upsertClients,
+  upsertProjects
+} from "../offline/db.js";
 import { initSyncLoop } from "../offline/sync.js";
 
 export default function FieldToday() {
@@ -30,10 +35,14 @@ export default function FieldToday() {
 
   async function load() {
     try {
-      const res = await api.get("/cards", {
-        params: { assigned_to: staffId }
-      });
-      const list = res.data || [];
+      const [cardsRes, clientsRes, projectsRes] = await Promise.all([
+        api.get("/cards", { params: { assigned_to: staffId } }),
+        api.get("/clients"),
+        api.get("/projects")
+      ]);
+      const list = cardsRes.data || [];
+      await upsertClients(clientsRes.data || []);
+      await upsertProjects(projectsRes.data || []);
       await upsertCards(list);
       updateLists(list);
     } catch (err) {
