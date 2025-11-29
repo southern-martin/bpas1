@@ -4,6 +4,18 @@ import { getQueue, removeQueue } from "./db.js";
 export async function processQueue() {
   if (!navigator.onLine) return;
   const items = await getQueue();
+  if (!items.length) return;
+
+  // Try batch sync first
+  try {
+    await api.post("/sync", { items });
+    for (const item of items) {
+      await removeQueue(item.id);
+    }
+    return;
+  } catch (err) {
+    console.warn("Batch sync failed, falling back to individual sync", err);
+  }
   for (const item of items) {
     try {
       await sendToServer(item);

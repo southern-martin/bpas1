@@ -12,8 +12,8 @@ import usersRoutes from "./src/routes/users.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import activitiesRoutes from "./src/routes/activities.routes.js";
 import aiCardRoutes from "./src/routes/aiCard.routes.js";
+import syncRoutes from "./src/routes/sync.routes.js";
 import { requireAuth, requireOwner } from "./src/middleware/auth.js";
-import activitiesRoutes from "./src/routes/activities.routes.js";
 
 dotenv.config();
 
@@ -31,6 +31,7 @@ app.use("/users", usersRoutes);
 app.use("/auth", authRoutes);
 app.use("/activities", requireAuth, requireOwner, activitiesRoutes);
 app.use("/ai", aiCardRoutes);
+app.use("/sync", syncRoutes);
 
 app.get("/", (req, res) => {
   res.send("BPAS 1 Backend + OpenAI connection is working");
