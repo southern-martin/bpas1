@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function CreateCard() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Task");
@@ -15,6 +16,7 @@ export default function CreateCard() {
   const [assignedTo, setAssignedTo] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [plannedBucket, setPlannedBucket] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -29,6 +31,20 @@ export default function CreateCard() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    const clientFromURL = params.get("client");
+    const projectFromURL = params.get("project");
+    const statusFromURL = params.get("status");
+    const bucketFromURL = params.get("bucket");
+    const staffFromURL = params.get("staff");
+
+    if (clientFromURL) setClientId(clientFromURL);
+    if (projectFromURL) setProjectId(projectFromURL);
+    if (statusFromURL) setType(statusFromURL);
+    if (bucketFromURL) setPlannedBucket(bucketFromURL);
+    if (staffFromURL) setAssignedTo(staffFromURL);
+  }, [params]);
 
   const filteredProjects = useMemo(
     () => (clientId ? projects.filter(p => p.client_id === clientId) : projects),
@@ -51,7 +67,15 @@ export default function CreateCard() {
       notes_clarified: notes || ""
     });
 
-    navigate(`/office/card/${res.data.id}`);
+    const newCardId = res.data.id;
+
+    if (plannedBucket) {
+      await api.patch(`/planning/${newCardId}`, {
+        planning_bucket: plannedBucket
+      });
+    }
+
+    navigate(`/office/card/${newCardId}`);
   }
 
   if (localStorage.getItem("role") !== "Owner") {
