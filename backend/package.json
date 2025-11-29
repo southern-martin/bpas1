@@ -22,7 +22,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@prisma/client": "^5.19.1",
-    "prisma": "^5.19.1"
+    "@prisma/client": "5.19.1",
+    "prisma": "5.19.1"
   }
 }
