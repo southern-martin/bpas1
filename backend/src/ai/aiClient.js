@@ -36,7 +36,19 @@ export async function aiPrefill(text) {
     messages: [
       {
         role: "user",
-        content: `Extract task info as JSON:\n${text}`,
+        content: `Given a natural-language description of work, extract as STRICT JSON:
+{
+  "title": "",
+  "type": "Task or Event",
+  "client": "",
+  "project": "",
+  "staff": "",
+  "time": "",
+  "status": "",
+  "planning": "",
+  "notes": ""
+}
+Only return JSON. Input:\n${text}`,
       },
     ],
   });

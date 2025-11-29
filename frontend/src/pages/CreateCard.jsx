@@ -17,6 +17,8 @@ export default function CreateCard() {
   const [eventTime, setEventTime] = useState("");
   const [notes, setNotes] = useState("");
   const [plannedBucket, setPlannedBucket] = useState(null);
+  const [aiText, setAiText] = useState("");
+  const [loadingAI, setLoadingAI] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -78,6 +80,28 @@ export default function CreateCard() {
     navigate(`/office/card/${newCardId}`);
   }
 
+  async function handleAIPrefill() {
+    if (!aiText.trim()) return;
+    setLoadingAI(true);
+    try {
+      const res = await api.post("/ai/prefill-card", { text: aiText });
+      const data = res.data || {};
+      setTitle(data.title || "");
+      setType(data.type || "Task");
+      if (data.client_id) setClientId(data.client_id);
+      if (data.project_id) setProjectId(data.project_id);
+      if (data.assigned_to_user_id) setAssignedTo(data.assigned_to_user_id);
+      setEventTime(data.event_time || "");
+      setNotes(data.notes || "");
+      setPlannedBucket(data.planning_bucket || null);
+    } catch (err) {
+      console.error("AI prefill error", err);
+      alert("AI prefill failed");
+    } finally {
+      setLoadingAI(false);
+    }
+  }
+
   if (localStorage.getItem("role") !== "Owner") {
     return <Navigate to="/login" replace />;
   }
@@ -86,6 +110,19 @@ export default function CreateCard() {
     <div style={{ padding: 20 }}>
       <button onClick={() => navigate(-1)}>← Back</button>
       <h1 style={{ marginTop: 10 }}>Create New Card</h1>
+
+      <div className="ai-box">
+        <h2>AI Create (Optional)</h2>
+        <textarea
+          className="ai-input"
+          placeholder="Describe the task or event..."
+          value={aiText}
+          onChange={e => setAiText(e.target.value)}
+        />
+        <button className="ai-btn" onClick={handleAIPrefill} disabled={loadingAI}>
+          {loadingAI ? "Thinking..." : "✨ AI Prefill"}
+        </button>
+      </div>
 
       <div style={{ marginTop: 20, display: "grid", gap: 12 }}>
         <label>
