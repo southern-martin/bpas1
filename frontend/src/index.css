@@ -192,6 +192,21 @@ select {
   margin-right: 6px;
 }
 
+.filter-bar {
+  display: flex;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.filter-bar select,
+.filter-bar button {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+}
+
 .select-staff {
   padding: 8px;
   border-radius: 6px;

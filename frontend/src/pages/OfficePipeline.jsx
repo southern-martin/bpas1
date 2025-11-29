@@ -13,9 +13,15 @@ export default function OfficePipeline() {
     done: [],
     blocked: []
   });
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [clientFilter, setClientFilter] = useState("");
+  const [projectFilter, setProjectFilter] = useState("");
 
   useEffect(() => {
     loadPipeline();
+    api.get("/clients").then(r => setClients(r.data));
+    api.get("/projects").then(r => setProjects(r.data));
   }, []);
 
   async function loadPipeline() {
@@ -48,31 +54,73 @@ export default function OfficePipeline() {
     loadPipeline();
   }
 
+  function filterCards(cards) {
+    return cards.filter(card => {
+      if (clientFilter && card.linked_client_id !== clientFilter) return false;
+      if (projectFilter && card.linked_project_id !== projectFilter) return false;
+      return true;
+    });
+  }
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Pipeline Board</h1>
+
+      <div className="filter-bar">
+        <select value={clientFilter} onChange={e => setClientFilter(e.target.value)}>
+          <option value="">All Clients</option>
+          {clients.map(c => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={projectFilter}
+          onChange={e => setProjectFilter(e.target.value)}
+          style={{ marginLeft: 10 }}
+        >
+          <option value="">All Projects</option>
+          {projects.map(p => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={() => {
+            setClientFilter("");
+            setProjectFilter("");
+          }}
+          style={{ marginLeft: 10 }}
+        >
+          Clear Filters
+        </button>
+      </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="pipeline-grid">
           <PipelineColumn
             droppableId="todo-col"
             title="To Do"
-            cards={pipeline.to_do}
+            cards={filterCards(pipeline.to_do)}
           />
           <PipelineColumn
             droppableId="doing-col"
             title="Doing"
-            cards={pipeline.doing}
+            cards={filterCards(pipeline.doing)}
           />
           <PipelineColumn
             droppableId="done-col"
             title="Done"
-            cards={pipeline.done}
+            cards={filterCards(pipeline.done)}
           />
           <PipelineColumn
             droppableId="blocked-col"
             title="Blocked"
-            cards={pipeline.blocked}
+            cards={filterCards(pipeline.blocked)}
           />
         </div>
       </DragDropContext>
