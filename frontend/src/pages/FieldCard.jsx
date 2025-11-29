@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
-import { enqueue } from "../offline/db.js";
+import { enqueue, getCardFromCache, upsertCards } from "../offline/db.js";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -17,17 +17,39 @@ export default function FieldCard() {
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
+  const [offline, setOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    async function load() {
+    loadCard();
+  }, [id]);
+
+  useEffect(() => {
+    const handler = () => setOffline(!navigator.onLine);
+    window.addEventListener("online", handler);
+    window.addEventListener("offline", handler);
+    return () => {
+      window.removeEventListener("online", handler);
+      window.removeEventListener("offline", handler);
+    };
+  }, []);
+
+  async function loadCard() {
+    try {
       const res = await api.get(`/cards/${id}`);
       const c = res.data;
       setCard(c);
       setStatus(c.status);
       setClarifiedNotes(c.notes_clarified || "");
+      await upsertCards([c]);
+    } catch (err) {
+      const cached = await getCardFromCache(id);
+      if (cached) {
+        setCard(cached);
+        setStatus(cached.status);
+        setClarifiedNotes(cached.notes_clarified || "");
+      }
     }
-    load();
-  }, [id]);
+  }
 
   async function handleClarify() {
     const res = await api.post("/clarify", { raw_text: rawNotes });
@@ -138,6 +160,7 @@ export default function FieldCard() {
     <div className="field-container">
       <div className="page-header">
         <h1>{card.title}</h1>
+        {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
       </div>
 
       <p>Client: {card.linked_client_id || "—"}</p>

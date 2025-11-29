@@ -29,6 +29,37 @@ export async function upsertCards(list = []) {
   await db.cards.bulkPut(list.map(c => ({ ...c, updated_at: c.updated_at || Date.now() })));
 }
 
+export async function upsertClients(list = []) {
+  if (!list.length) return;
+  await db.clients.bulkPut(list);
+}
+
+export async function upsertProjects(list = []) {
+  if (!list.length) return;
+  await db.projects.bulkPut(list);
+}
+
+export async function upsertActivities(list = []) {
+  if (!list.length) return;
+  await db.activities.bulkPut(list);
+}
+
 export async function getCardsFromCache() {
   return db.cards.toArray();
+}
+
+export async function getCardFromCache(id) {
+  return db.cards.get(id);
+}
+
+export async function getClientsFromCache() {
+  return db.clients.toArray();
+}
+
+export async function getProjectsFromCache() {
+  return db.projects.toArray();
+}
+
+export async function getActivitiesForCard(cardId) {
+  return db.activities.where("card_id").equals(cardId).sortBy("created_at");
 }

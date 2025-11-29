@@ -118,6 +118,15 @@ a:hover {
   margin: 0;
 }
 
+.offline-banner {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
 .section-title {
   margin-top: 20px;
   font-size: 18px;
