@@ -28,6 +28,14 @@ body {
   margin-left: auto;
 }
 
+.logout-btn {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 h1,
 h2,
 h3 {

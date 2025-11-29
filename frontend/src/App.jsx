@@ -21,6 +21,18 @@ export default function App() {
         <Link to="/office/planning">Planning</Link>
         <Link to="/office/clients">Clients</Link>
         <Link to="/office/projects">Projects</Link>
+        <Link to="/office/create-card">Create Card</Link>
+        <button
+          className="logout-btn"
+          onClick={() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("userId");
+            window.location.href = "/login";
+          }}
+        >
+          Logout
+        </button>
       </nav>
 
       <Routes>
