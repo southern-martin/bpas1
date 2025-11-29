@@ -30,6 +30,16 @@ export async function getClientById(req, res) {
   }
 }
 
+export async function getClientCards(req, res) {
+  try {
+    const cards = await clientsService.getClientCards(req.params.id);
+    res.json(cards);
+  } catch (err) {
+    console.error("Get Client Cards Error:", err);
+    res.status(500).json({ error: "Failed to load client cards" });
+  }
+}
+
 export async function updateClient(req, res) {
   try {
     const client = await clientsService.updateClient(req.params.id, req.body);

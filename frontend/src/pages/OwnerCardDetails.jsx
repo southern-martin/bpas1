@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { api } from "../api/client.js";
@@ -10,6 +10,7 @@ export default function OwnerCardDetails() {
   const [projects, setProjects] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [status, setStatus] = useState("To Do");
+  const clientMap = Object.fromEntries(clients.map(c => [c.id, c.name]));
 
   const load = useCallback(async () => {
     const res = await api.get(`/cards/${id}`);
@@ -56,6 +57,15 @@ export default function OwnerCardDetails() {
 
       <div style={{ marginTop: 20 }}>
         <h2>Client</h2>
+        <div style={{ marginBottom: 6 }}>
+          {card.linked_client_id ? (
+            <Link to={`/office/client/${card.linked_client_id}`}>
+              {clientMap[card.linked_client_id] || card.linked_client_id}
+            </Link>
+          ) : (
+            "None"
+          )}
+        </div>
         <select
           value={card.linked_client_id || ""}
           onChange={e => updateCard({ linked_client_id: e.target.value || null })}

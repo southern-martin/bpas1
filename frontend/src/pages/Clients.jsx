@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
 
 export default function Clients() {
@@ -56,6 +57,9 @@ export default function Clients() {
         <tbody>
           {clients.map(c => (
             <tr key={c.id}>
+              <td>
+                <Link to={`/office/client/${c.id}`}>{c.name}</Link>
+              </td>
               <td>
                 <input value={c.name} onChange={e => updateClient(c.id, e.target.value)} />
               </td>

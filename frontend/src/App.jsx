@@ -6,6 +6,7 @@ import OwnerPlanning from "./pages/OwnerPlanning.jsx";
 import Clients from "./pages/Clients.jsx";
 import Projects from "./pages/Projects.jsx";
 import OwnerCardDetails from "./pages/OwnerCardDetails.jsx";
+import ClientView from "./pages/ClientView.jsx";
 import { Link } from "react-router-dom";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/office/clients" element={<Clients />} />
         <Route path="/office/projects" element={<Projects />} />
         <Route path="/office/card/:id" element={<OwnerCardDetails />} />
+        <Route path="/office/client/:id" element={<ClientView />} />
       </Routes>
     </>
   );
