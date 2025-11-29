@@ -127,6 +127,14 @@ a:hover {
   font-size: 14px;
 }
 
+.link-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
 .section-title {
   margin-top: 20px;
   font-size: 18px;

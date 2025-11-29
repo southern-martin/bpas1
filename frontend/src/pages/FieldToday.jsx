@@ -8,7 +8,7 @@ import {
   upsertProjects,
   getQueueCount
 } from "../offline/db.js";
-import { initSyncLoop } from "../offline/sync.js";
+import { initSyncLoop, processQueue } from "../offline/sync.js";
 
 export default function FieldToday() {
   const [events, setEvents] = useState([]);
@@ -17,6 +17,9 @@ export default function FieldToday() {
   const [showInstall, setShowInstall] = useState(false);
   const [offline, setOffline] = useState(!navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
+  const [lastSync, setLastSync] = useState(
+    localStorage.getItem("lastSync")
+  );
   const staffId = localStorage.getItem("userId") || "staff-1";
 
   useEffect(() => {
@@ -72,6 +75,15 @@ export default function FieldToday() {
     setPendingCount(count);
   }
 
+  async function handleSyncNow() {
+    const synced = await processQueue();
+    updateQueueCount();
+    if (synced > 0) {
+      const ts = localStorage.getItem("lastSync");
+      setLastSync(ts);
+    }
+  }
+
   if (localStorage.getItem("role") !== "Staff") {
     return <Navigate to="/login" replace />;
   }
@@ -83,6 +95,16 @@ export default function FieldToday() {
         {offline && (
           <div className="offline-banner">
             Offline — changes will sync when online{pendingCount ? ` (${pendingCount} pending)` : ""}
+          </div>
+        )}
+        {!offline && pendingCount > 0 && (
+          <div className="offline-banner">
+            {pendingCount} pending changes — <button className="link-btn" onClick={handleSyncNow}>Sync now</button>
+          </div>
+        )}
+        {lastSync && (
+          <div className="offline-banner" style={{ background: "#e0f2fe", color: "#075985" }}>
+            Last synced: {new Date(parseInt(lastSync, 10)).toLocaleString()}
           </div>
         )}
       </div>

@@ -2,9 +2,11 @@ import { api } from "../api/client.js";
 import { getQueue, removeQueue } from "./db.js";
 
 export async function processQueue() {
-  if (!navigator.onLine) return;
+  if (!navigator.onLine) return 0;
   const items = await getQueue();
-  if (!items.length) return;
+  if (!items.length) return 0;
+
+  let synced = 0;
 
   // Try batch sync first
   try {
@@ -12,7 +14,9 @@ export async function processQueue() {
     for (const item of items) {
       await removeQueue(item.id);
     }
-    return;
+    synced = items.length;
+    localStorage.setItem("lastSync", Date.now().toString());
+    return synced;
   } catch (err) {
     console.warn("Batch sync failed, falling back to individual sync", err);
   }
@@ -20,12 +24,19 @@ export async function processQueue() {
     try {
       await sendToServer(item);
       await removeQueue(item.id);
+      synced += 1;
     } catch (err) {
       console.error("Sync failed for item", item.id, err);
       // continue to next item to avoid blocking the queue if one fails
       continue;
     }
   }
+
+  if (synced > 0) {
+    localStorage.setItem("lastSync", Date.now().toString());
+  }
+
+  return synced;
 }
 
 async function sendToServer(item) {
