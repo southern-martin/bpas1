@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { api } from "../api/client.js";
+import { enqueue, getCardFromCache, upsertCards } from "../offline/db.js";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -16,17 +17,39 @@ export default function FieldCard() {
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
+  const [offline, setOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    async function load() {
+    loadCard();
+  }, [id]);
+
+  useEffect(() => {
+    const handler = () => setOffline(!navigator.onLine);
+    window.addEventListener("online", handler);
+    window.addEventListener("offline", handler);
+    return () => {
+      window.removeEventListener("online", handler);
+      window.removeEventListener("offline", handler);
+    };
+  }, []);
+
+  async function loadCard() {
+    try {
       const res = await api.get(`/cards/${id}`);
       const c = res.data;
       setCard(c);
       setStatus(c.status);
       setClarifiedNotes(c.notes_clarified || "");
+      await upsertCards([c]);
+    } catch (err) {
+      const cached = await getCardFromCache(id);
+      if (cached) {
+        setCard(cached);
+        setStatus(cached.status);
+        setClarifiedNotes(cached.notes_clarified || "");
+      }
     }
-    load();
-  }, [id]);
+  }
 
   async function handleClarify() {
     const res = await api.post("/clarify", { raw_text: rawNotes });
@@ -36,11 +59,21 @@ export default function FieldCard() {
   async function handleSave() {
     setSaving(true);
 
-    await api.post(`/cards/${id}/updates`, {
+    const payload = {
       status,
       notes_clarified: clarifiedNotes,
       user_id: localStorage.getItem("userId") || "staff-1"
-    });
+    };
+
+    if (navigator.onLine) {
+      await api.post(`/cards/${id}/updates`, payload);
+    } else {
+      await enqueue({
+        id: crypto.randomUUID(),
+        type: "activity",
+        payload: { cardId: id, body: payload }
+      });
+    }
 
     setSaving(false);
     navigate("/field/today");
@@ -92,12 +125,25 @@ export default function FieldCard() {
       const formData = new FormData();
       formData.append("audio", blob, "recording.webm");
 
-      const res = await api.post("/audio/transcribe", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-
-      const newText = res.data.raw_text || "";
-      setRawNotes(prev => (prev ? `${prev}\n${newText}` : newText));
+      if (navigator.onLine) {
+        const res = await api.post("/audio/transcribe", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+        const newText = res.data.raw_text || "";
+        setRawNotes(prev => (prev ? `${prev}\n${newText}` : newText));
+      } else {
+        // offline: queue transcription later (store blob reference)
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64 = reader.result;
+          await enqueue({
+            id: crypto.randomUUID(),
+            type: "audio-upload",
+            payload: { cardId: id, dataUrl: base64 }
+          });
+        };
+        reader.readAsDataURL(blob);
+      }
     } catch (err) {
       console.error("Transcription upload error:", err);
       alert("Failed to transcribe audio.");
@@ -114,6 +160,7 @@ export default function FieldCard() {
     <div className="field-container">
       <div className="page-header">
         <h1>{card.title}</h1>
+        {offline && <div className="offline-banner">Offline — changes will sync when online</div>}
       </div>
 
       <p>Client: {card.linked_client_id || "—"}</p>
