@@ -34,3 +34,10 @@ export async function deleteProject(id) {
   await prisma.project.delete({ where: { id } });
   return true;
 }
+
+export function getProjectCards(id) {
+  return prisma.card.findMany({
+    where: { linked_project_id: id },
+    orderBy: { created_at: "desc" }
+  });
+}

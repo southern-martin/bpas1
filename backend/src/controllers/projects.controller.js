@@ -30,6 +30,16 @@ export async function getProjectById(req, res) {
   }
 }
 
+export async function getProjectCards(req, res) {
+  try {
+    const cards = await projectsService.getProjectCards(req.params.id);
+    res.json(cards);
+  } catch (err) {
+    console.error("Get Project Cards Error:", err);
+    res.status(500).json({ error: "Failed to load project cards" });
+  }
+}
+
 export async function updateProject(req, res) {
   try {
     const project = await projectsService.updateProject(req.params.id, req.body);

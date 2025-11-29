@@ -11,6 +11,7 @@ export default function OwnerCardDetails() {
   const [staffList, setStaffList] = useState([]);
   const [status, setStatus] = useState("To Do");
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c.name]));
+  const projectMap = Object.fromEntries(projects.map(p => [p.id, p.name]));
 
   const load = useCallback(async () => {
     const res = await api.get(`/cards/${id}`);
@@ -81,6 +82,15 @@ export default function OwnerCardDetails() {
 
       <div style={{ marginTop: 20 }}>
         <h2>Project</h2>
+        <div style={{ marginBottom: 6 }}>
+          {card.linked_project_id ? (
+            <Link to={`/office/project/${card.linked_project_id}`}>
+              {projectMap[card.linked_project_id] || card.linked_project_id}
+            </Link>
+          ) : (
+            "None"
+          )}
+        </div>
         <select
           value={card.linked_project_id || ""}
           onChange={e => updateCard({ linked_project_id: e.target.value || null })}
