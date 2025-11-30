@@ -15,6 +15,8 @@ import { Link } from "react-router-dom";
 import OfficeLayout from "./layouts/OfficeLayout.jsx";
 
 export default function App() {
+  const isAuthed = Boolean(localStorage.getItem("token"));
+
   return (
     <>
       <nav className="top-nav">
@@ -24,17 +26,19 @@ export default function App() {
         <Link to="/office/clients">Clients</Link>
         <Link to="/office/projects">Projects</Link>
         <Link to="/office/create-card">Create Card</Link>
-        <button
-          className="logout-btn"
-          onClick={() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-            localStorage.removeItem("userId");
-            window.location.href = "/login";
-          }}
-        >
-          Logout
-        </button>
+        {isAuthed && (
+          <button
+            className="logout-btn"
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("role");
+              localStorage.removeItem("userId");
+              window.location.href = "/login";
+            }}
+          >
+            Logout
+          </button>
+        )}
       </nav>
 
       <Routes>
