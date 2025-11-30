@@ -30,10 +30,14 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
   const clientRes = await request.get(`${API_URL}/clients`, {
     headers: authHeaders
   });
+  expect(clientRes.ok()).toBeTruthy();
   const clients = await clientRes.json();
-  const myClient = Array.isArray(clients)
-    ? clients.find((c: any) => c.name === clientName)
-    : null;
+  const list = Array.isArray(clients)
+    ? clients
+    : Array.isArray(clients?.data)
+      ? clients.data
+      : [];
+  const myClient = list.find((c: any) => c.name === clientName);
   expect(myClient).toBeTruthy();
   const projectName = `Project ${Date.now()}`;
   const projRes = await request.post(`${API_URL}/projects`, {
@@ -45,12 +49,9 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
   // 4) Create Card in Pipeline
   await page.goto("/office/create-card");
   await page.fill("input[placeholder='Card title']", "Card 1");
-  await page.selectOption("select", { label: "Task" });
-  // select client
-  await page.selectOption("select", { value: myClient.id });
-  // select project (second select on page)
-  const selects = page.locator("select");
-  await selects.nth(1).selectOption({ label: projectName });
+  await page.getByLabel("Card Type").selectOption({ label: "Task" });
+  await page.getByLabel("Client").selectOption({ value: myClient.id });
+  await page.getByLabel("Project").selectOption({ label: projectName });
   await page.click("text=Create Card");
 
   // Card opens; go to pipeline to verify
