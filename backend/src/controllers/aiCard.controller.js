@@ -8,7 +8,13 @@ export async function prefillCard(req, res) {
     return res.status(400).json({ error: "Text is required" });
   }
 
-  const aiResponse = await bpasAI("prefill", text);
+  let aiResponse;
+  try {
+    aiResponse = await bpasAI("prefill", text);
+  } catch (err) {
+    console.error("AI prefill call failed", err);
+    return res.status(500).json({ error: "AI prefill call failed" });
+  }
   let parsed;
 
   try {
@@ -30,10 +36,14 @@ export async function prefillCard(req, res) {
         const candidate = sanitized.slice(start, end + 1);
         parsed = JSON.parse(candidate);
       } else {
+        console.error("AI prefill parse failed (no JSON block found)", {
+          raw: aiResponse
+        });
         throw err;
       }
     }
   } catch (err) {
+    console.error("AI prefill parse error", { raw: aiResponse, err });
     return res.status(500).json({ error: "AI returned invalid JSON", raw: aiResponse });
   }
 
