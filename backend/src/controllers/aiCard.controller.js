@@ -49,23 +49,23 @@ export async function prefillCard(req, res) {
 
   let client = null;
   if (parsed.client) {
-    client = await prisma.client.findFirst({
-      where: { name: { contains: parsed.client, mode: "insensitive" } }
-    });
+    const needle = parsed.client.toLowerCase().trim();
+    const candidates = await prisma.client.findMany();
+    client = candidates.find(c => (c.name || "").toLowerCase().includes(needle)) || null;
   }
 
   let project = null;
   if (parsed.project) {
-    project = await prisma.project.findFirst({
-      where: { name: { contains: parsed.project, mode: "insensitive" } }
-    });
+    const needle = parsed.project.toLowerCase().trim();
+    const candidates = await prisma.project.findMany();
+    project = candidates.find(p => (p.name || "").toLowerCase().includes(needle)) || null;
   }
 
   let staff = null;
   if (parsed.staff) {
-    staff = await prisma.user.findFirst({
-      where: { name: { contains: parsed.staff, mode: "insensitive" }, role: "Staff" }
-    });
+    const needle = parsed.staff.toLowerCase().trim();
+    const candidates = await prisma.user.findMany({ where: { role: "Staff" } });
+    staff = candidates.find(u => (u.name || "").toLowerCase().includes(needle)) || null;
   }
 
   res.json({
