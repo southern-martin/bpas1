@@ -2,17 +2,26 @@ import { prisma } from "../db/prisma.js";
 
 export function createClient(data) {
   return prisma.client.create({
-    data: { name: data.name }
+    data: {
+      name: data.name,
+      phone: data.phone || null,
+      email: data.email || null,
+      address: data.address || null,
+      notes: data.notes || null
+    }
   });
 }
 
 export function getClients() {
-  return prisma.client.findMany();
+  return prisma.client.findMany({
+    orderBy: { created_at: "desc" }
+  });
 }
 
 export function getClientById(id) {
   return prisma.client.findUnique({
-    where: { id }
+    where: { id },
+    include: { projects: true }
   });
 }
 
@@ -28,7 +37,13 @@ export async function updateClient(id, data) {
   if (!exists) return null;
   return prisma.client.update({
     where: { id },
-    data
+    data: {
+      name: data.name ?? exists.name,
+      phone: data.phone ?? exists.phone,
+      email: data.email ?? exists.email,
+      address: data.address ?? exists.address,
+      notes: data.notes ?? exists.notes
+    }
   });
 }
 

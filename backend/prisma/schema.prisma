@@ -36,9 +36,15 @@ model Activity {
 }
 
 model Client {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
-  created_at DateTime @default(now())
+  phone      String?
+  email      String?
+  address    String?
+  notes      String?
+  created_at DateTime  @default(now())
+
+  projects   Project[]
 }
 
 model Project {
@@ -46,6 +52,8 @@ model Project {
   name       String
   client_id  String
   created_at DateTime @default(now())
+
+  client     Client   @relation(fields: [client_id], references: [id])
 }
 
 model User {
