@@ -12,7 +12,12 @@ export async function prefillCard(req, res) {
   let parsed;
 
   try {
-    parsed = JSON.parse(aiResponse);
+    // Some models wrap JSON in code fences; strip them before parsing
+    const sanitized = aiResponse
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+    parsed = JSON.parse(sanitized);
   } catch (err) {
     return res.status(500).json({ error: "AI returned invalid JSON", raw: aiResponse });
   }
