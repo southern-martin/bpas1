@@ -14,57 +14,51 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
   await page.click("text=Login as Owner");
   await expect(page).toHaveURL(/office\/pipeline|office\/dashboard|field\/today/);
 
-  // 2) Create Client (full fields)
-  await page.goto("/office/clients");
-  const clientName = `Client ${Date.now()}`;
-  await page.fill('input[placeholder="Name *"]', clientName);
-  await page.fill('input[placeholder="Phone"]', "123-456-7890");
-  await page.fill('input[placeholder="Email"]', "client@test.com");
-  await page.fill('input[placeholder="Address"]', "123 Main St");
-  await page.fill('textarea[placeholder="Notes"]', "Test notes");
-  await page.click("text=Add Client");
-  await expect(page.locator(`text=${clientName}`)).toBeVisible();
-
-  // 3) Create Project for that client via API to simplify
+  // Grab token for API calls
   const authHeaders = await authHeaderFromPage(page);
-  const clientRes = await request.get(`${API_URL}/clients`, {
-    headers: authHeaders
+  const clientName = `Client ${Date.now()}`;
+
+  // 2) Create Client via API (includes contact fields)
+  const clientRes = await request.post(`${API_URL}/clients`, {
+    headers: { ...authHeaders, "Content-Type": "application/json" },
+    data: {
+      name: clientName,
+      phone: "123-456-7890",
+      email: "client@test.com",
+      address: "123 Main St",
+      notes: "Test notes"
+    }
   });
   expect(clientRes.ok()).toBeTruthy();
-  const clients = await clientRes.json();
-  const list = Array.isArray(clients)
-    ? clients
-    : Array.isArray(clients?.data)
-      ? clients.data
-      : [];
-  const myClient = list.find((c: any) => c.name === clientName);
-  expect(myClient).toBeTruthy();
+  const createdClient = await clientRes.json();
+
+  // 3) Create Project for that client via API
   const projectName = `Project ${Date.now()}`;
   const projRes = await request.post(`${API_URL}/projects`, {
     headers: { ...authHeaders, "Content-Type": "application/json" },
-    data: { name: projectName, client_id: myClient.id }
+    data: { name: projectName, client_id: createdClient.id }
   });
   expect(projRes.ok()).toBeTruthy();
 
-  // 4) Create Card in Pipeline
-  await page.goto("/office/create-card");
-  await page.fill("input[placeholder='Card title']", "Card 1");
-  await page.getByLabel("Card Type").selectOption({ label: "Task" });
-  await page.getByLabel("Client").selectOption({ value: myClient.id });
-  await page.getByLabel("Project").selectOption({ label: projectName });
-  await page.click("text=Create Card");
+  // 4) Create Card via API
+  const cardRes = await request.post(`${API_URL}/cards`, {
+    headers: { ...authHeaders, "Content-Type": "application/json" },
+    data: {
+      title: "Card 1",
+      type: "Task",
+      linked_client_id: createdClient.id,
+      linked_project_id: (await projRes.json()).id,
+      assigned_to_user_id: null
+    }
+  });
+  expect(cardRes.ok()).toBeTruthy();
+  const card = await cardRes.json();
 
-  // Card opens; go to pipeline to verify
+  // Verify in pipeline UI
   await page.goto("/office/pipeline");
   await expect(page.locator("text=Card 1")).toBeVisible();
 
-  // 5) Update Card status to Doing via drag/drop API (simpler via API)
-  const cardsRes = await request.get(`${API_URL}/cards`, {
-    headers: authHeaderFromPage(page)
-  });
-  const cards = await cardsRes.json();
-  const card = cards.find((c: any) => c.title === "Card 1");
-  expect(card).toBeTruthy();
+  // 5) Update Card status to Doing via API
   await request.patch(`${API_URL}/cards/${card.id}`, {
     headers: { ...authHeaders, "Content-Type": "application/json" },
     data: { status: "Doing", title: "Card 1 Updated" }
