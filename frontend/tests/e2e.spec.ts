@@ -44,7 +44,7 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
   const cardRes = await request.post(`${API_URL}/cards`, {
     headers: { ...authHeaders, "Content-Type": "application/json" },
     data: {
-      title: "Card 1",
+      title: `Card ${Date.now()}`,
       type: "Task",
       linked_client_id: createdClient.id,
       linked_project_id: (await projRes.json()).id,
@@ -56,17 +56,17 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
 
   // Verify in pipeline UI
   await page.goto("/office/pipeline");
-  await expect(page.locator("text=Card 1")).toBeVisible();
+  await expect(page.locator(`text=${card.title}`)).toBeVisible();
 
   // 5) Update Card status to Doing via API
   await request.patch(`${API_URL}/cards/${card.id}`, {
     headers: { ...authHeaders, "Content-Type": "application/json" },
-    data: { status: "Doing", title: "Card 1 Updated" }
+    data: { status: "Doing", title: `${card.title} Updated` }
   });
 
   // Verify status in pipeline
   await page.goto("/office/pipeline");
-  await expect(page.locator("text=Card 1 Updated")).toBeVisible();
+  await expect(page.locator(`text=${card.title} Updated`)).toBeVisible();
 
   // (Optional) Mark Done via API to simulate removal from active work
   await request.patch(`${API_URL}/cards/${card.id}`, {
