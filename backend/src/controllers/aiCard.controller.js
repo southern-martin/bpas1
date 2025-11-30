@@ -12,12 +12,27 @@ export async function prefillCard(req, res) {
   let parsed;
 
   try {
-    // Some models wrap JSON in code fences; strip them before parsing
-    const sanitized = aiResponse
+    // Ensure string and strip code fences
+    const raw =
+      typeof aiResponse === "string" ? aiResponse : JSON.stringify(aiResponse);
+    const sanitized = raw
       .replace(/```json/gi, "")
       .replace(/```/g, "")
       .trim();
-    parsed = JSON.parse(sanitized);
+
+    try {
+      parsed = JSON.parse(sanitized);
+    } catch (err) {
+      // Fallback: try to parse substring between first { and last }
+      const start = sanitized.indexOf("{");
+      const end = sanitized.lastIndexOf("}");
+      if (start !== -1 && end !== -1 && end > start) {
+        const candidate = sanitized.slice(start, end + 1);
+        parsed = JSON.parse(candidate);
+      } else {
+        throw err;
+      }
+    }
   } catch (err) {
     return res.status(500).json({ error: "AI returned invalid JSON", raw: aiResponse });
   }
