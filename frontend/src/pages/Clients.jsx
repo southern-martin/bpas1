@@ -4,7 +4,13 @@ import { api } from "../api/client.js";
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
-  const [newName, setNewName] = useState("");
+  const [newClient, setNewClient] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    notes: ""
+  });
 
   useEffect(() => {
     load();
@@ -16,14 +22,28 @@ export default function Clients() {
   }
 
   async function addClient() {
-    if (!newName.trim()) return;
-    await api.post("/clients", { name: newName });
-    setNewName("");
+    if (!newClient.name.trim()) return;
+    await api.post("/clients", newClient);
+    setNewClient({ name: "", phone: "", email: "", address: "", notes: "" });
     load();
   }
 
-  async function updateClient(id, name) {
-    await api.patch(`/clients/${id}`, { name });
+  function handleEdit(id, field, value) {
+    setClients(prev =>
+      prev.map(c => (c.id === id ? { ...c, [field]: value } : c))
+    );
+  }
+
+  async function saveClient(id) {
+    const client = clients.find(c => c.id === id);
+    if (!client) return;
+    await api.patch(`/clients/${id}`, {
+      name: client.name,
+      phone: client.phone,
+      email: client.email,
+      address: client.address,
+      notes: client.notes
+    });
     load();
   }
 
@@ -40,21 +60,51 @@ export default function Clients() {
     <div style={{ padding: 20 }}>
       <h1>Clients</h1>
 
-      <div style={{ marginBottom: 20 }}>
-        <input
-          placeholder="New client name"
-          value={newName}
-          onChange={e => setNewName(e.target.value)}
-        />
-        <button onClick={addClient} style={{ marginLeft: 8 }}>
-          Add
-        </button>
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h2 style={{ marginTop: 0 }}>Create New Client</h2>
+        <div style={{ display: "grid", gap: 8 }}>
+          <input
+            placeholder="Name *"
+            value={newClient.name}
+            onChange={e => setNewClient({ ...newClient, name: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Phone"
+            value={newClient.phone}
+            onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
+          />
+          <input
+            placeholder="Email"
+            type="email"
+            value={newClient.email}
+            onChange={e => setNewClient({ ...newClient, email: e.target.value })}
+          />
+          <input
+            placeholder="Address"
+            value={newClient.address}
+            onChange={e => setNewClient({ ...newClient, address: e.target.value })}
+          />
+          <textarea
+            placeholder="Notes"
+            value={newClient.notes}
+            onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
+            rows={3}
+          />
+          <button onClick={addClient} style={{ marginTop: 8 }}>
+            Add Client
+          </button>
+        </div>
       </div>
 
       <table className="table">
         <thead>
           <tr>
             <th>Client Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Notes</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -65,9 +115,32 @@ export default function Clients() {
                 <Link to={`/office/client/${c.id}`}>{c.name}</Link>
               </td>
               <td>
-                <input value={c.name} onChange={e => updateClient(c.id, e.target.value)} />
+                <input
+                  value={c.phone || ""}
+                  onChange={e => handleEdit(c.id, "phone", e.target.value)}
+                />
               </td>
               <td>
+                <input
+                  value={c.email || ""}
+                  onChange={e => handleEdit(c.id, "email", e.target.value)}
+                />
+              </td>
+              <td>
+                <input
+                  value={c.address || ""}
+                  onChange={e => handleEdit(c.id, "address", e.target.value)}
+                />
+              </td>
+              <td>
+                <textarea
+                  value={c.notes || ""}
+                  onChange={e => handleEdit(c.id, "notes", e.target.value)}
+                  rows={2}
+                />
+              </td>
+              <td style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <button onClick={() => saveClient(c.id)}>Save</button>
                 <button onClick={() => deleteClient(c.id)}>Delete</button>
               </td>
             </tr>
