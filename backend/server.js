@@ -14,6 +14,7 @@ import activitiesRoutes from "./src/routes/activities.routes.js";
 import aiCardRoutes from "./src/routes/aiCard.routes.js";
 import syncRoutes from "./src/routes/sync.routes.js";
 import { requireAuth, requireOwner } from "./src/middleware/auth.js";
+import { logError, logInfo } from "./src/utils/logger.js";
 
 dotenv.config();
 
@@ -37,5 +38,20 @@ app.get("/", (req, res) => {
   res.send("BPAS 1 Backend + OpenAI connection is working");
 });
 
+// Global error handler
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  logError(`${req.method} ${req.url} - ${err.stack || err}`);
+  res.status(500).json({ error: "Internal server error" });
+});
+
 const PORT = 4000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => logInfo(`Server running on ${PORT}`));
+
+process.on("unhandledRejection", err => {
+  logError(`Unhandled Rejection: ${err?.stack || err}`);
+});
+
+process.on("uncaughtException", err => {
+  logError(`Uncaught Exception: ${err?.stack || err}`);
+});
