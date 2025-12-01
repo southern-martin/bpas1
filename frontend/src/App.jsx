@@ -13,6 +13,7 @@ import CreateCard from "./pages/CreateCard.jsx";
 import OwnerDashboard from "./pages/OwnerDashboard.jsx";
 import { Link } from "react-router-dom";
 import OfficeLayout from "./layouts/OfficeLayout.jsx";
+import ClientEdit from "./pages/ClientEdit.jsx";
 
 export default function App() {
   const isAuthed = Boolean(localStorage.getItem("token"));
@@ -99,6 +100,14 @@ export default function App() {
           element={
             <OfficeLayout>
               <ClientView />
+            </OfficeLayout>
+          }
+        />
+        <Route
+          path="/office/client/:id/edit"
+          element={
+            <OfficeLayout>
+              <ClientEdit />
             </OfficeLayout>
           }
         />
