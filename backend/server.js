@@ -38,6 +38,12 @@ app.get("/", (req, res) => {
   res.send("BPAS 1 Backend + OpenAI connection is working");
 });
 
+// 404 handler
+app.use((req, res) => {
+  logError(`Not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ error: "Not found" });
+});
+
 // Global error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
