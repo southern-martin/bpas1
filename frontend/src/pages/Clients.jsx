@@ -24,6 +24,7 @@ export default function Clients() {
   async function addClient() {
     if (!newClient.name.trim()) return;
     await api.post("/clients", newClient);
+    window.__toast?.success?.("Client added");
     setNewClient({ name: "", phone: "", email: "", address: "", notes: "" });
     load();
   }
@@ -37,18 +38,20 @@ export default function Clients() {
   async function saveClient(id) {
     const client = clients.find(c => c.id === id);
     if (!client) return;
-    await api.patch(`/clients/${id}`, {
+    await api.put(`/clients/${id}`, {
       name: client.name,
       phone: client.phone,
       email: client.email,
       address: client.address,
       notes: client.notes
     });
+    window.__toast?.success?.("Client saved");
     load();
   }
 
   async function deleteClient(id) {
     await api.delete(`/clients/${id}`);
+    window.__toast?.info?.("Client deleted");
     load();
   }
 

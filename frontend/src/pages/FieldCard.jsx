@@ -12,6 +12,7 @@ import {
   getQueueCount
 } from "../offline/db.js";
 import { initSyncLoop } from "../offline/sync.js";
+import { useToast } from "../components/ToastProvider.jsx";
 
 export default function FieldCard() {
   const { id } = useParams();
@@ -31,6 +32,7 @@ export default function FieldCard() {
   const chunksRef = useRef([]);
   const [offline, setOffline] = useState(!navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
+  const toast = useToast();
 
   useEffect(() => {
     loadCard();
@@ -103,12 +105,14 @@ export default function FieldCard() {
 
     if (navigator.onLine) {
       await api.post(`/cards/${id}/updates`, payload);
+      toast.success("Saved");
     } else {
       await enqueue({
         id: crypto.randomUUID(),
         type: "activity",
         payload: { cardId: id, body: payload }
       });
+      toast.info("Saved offline; will sync");
     }
 
     setSaving(false);
@@ -182,7 +186,7 @@ export default function FieldCard() {
       }
     } catch (err) {
       console.error("Transcription upload error:", err);
-      alert("Failed to transcribe audio.");
+      toast.error("Failed to transcribe audio.");
     }
   }
 

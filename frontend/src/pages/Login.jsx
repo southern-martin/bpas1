@@ -5,21 +5,34 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [staffId, setStaffId] = useState("");
+  const [error, setError] = useState("");
 
   async function handleOwnerLogin() {
-    const res = await api.post("/auth/login", { email, password });
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("role", res.data.user.role);
-    localStorage.setItem("userId", res.data.user.id);
-    window.location.href = "/office/dashboard";
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userId", res.data.user.id);
+      window.__toast?.success?.("Logged in as Owner");
+      window.location.href = "/office/dashboard";
+    } catch (err) {
+      setError("Owner login failed");
+      window.__toast?.error?.("Owner login failed");
+    }
   }
 
   async function handleStaffLogin() {
-    const res = await api.post("/auth/login", { staff_id: staffId });
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("role", res.data.user.role);
-    localStorage.setItem("userId", res.data.user.id);
-    window.location.href = "/field/today";
+    try {
+      const res = await api.post("/auth/login", { staff_id: staffId });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("userId", res.data.user.id);
+      window.__toast?.success?.("Logged in as Staff");
+      window.location.href = "/field/today";
+    } catch (err) {
+      setError("Staff login failed");
+      window.__toast?.error?.("Staff login failed");
+    }
   }
 
   return (
@@ -51,6 +64,7 @@ export default function Login() {
           <p style={{ margin: "6px 0 0", color: "#6b7280" }}>
             Sign in as Owner or Staff to continue.
           </p>
+          {error && <p style={{ color: "#dc2626", marginTop: 8 }}>{error}</p>}
         </div>
 
         {/* Owner */}

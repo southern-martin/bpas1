@@ -17,6 +17,9 @@ export default function OwnerPlanning() {
     await api.patch(`/planning/${cardId}`, {
       planning_bucket: bucketName
     });
+    window.__toast?.success?.(
+      bucketName ? `Moved to ${bucketName}` : "Removed from planning"
+    );
     loadPlanning();
   }
 

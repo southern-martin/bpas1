@@ -24,16 +24,19 @@ export default function Projects() {
     await api.post("/projects", { name: newName, client_id: selectedClient });
     setNewName("");
     setSelectedClient("");
+    window.__toast?.success?.("Project added");
     load();
   }
 
   async function updateProject(id, field, value) {
     await api.patch(`/projects/${id}`, { [field]: value });
+    window.__toast?.success?.("Project updated");
     load();
   }
 
   async function deleteProject(id) {
     await api.delete(`/projects/${id}`);
+    window.__toast?.info?.("Project deleted");
     load();
   }
 

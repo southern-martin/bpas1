@@ -21,6 +21,14 @@ api.interceptors.response.use(
       localStorage.removeItem("userId");
       window.location.href = "/login";
     }
+    const msg =
+      err?.response?.data?.error ||
+      err?.response?.data?.message ||
+      err.message ||
+      "Request failed";
+    if (window.__toast?.error) {
+      window.__toast.error(msg);
+    }
     return Promise.reject(err);
   }
 );
