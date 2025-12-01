@@ -42,11 +42,17 @@ export default function ClientView() {
   if (!client) return <div className="page">Client not found.</div>;
 
   return (
-    <div className="page space-y-6 max-w-3xl">
+    <div className="page space-y-6">
       {/* HEADER */}
-      <div className="flex justify-between items-center gap-2">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <button onClick={() => navigate(-1)} className="btn btn-light" style={{ marginRight: 8 }}>
+          <h1 style={{ margin: 0 }}>{client.name}</h1>
+          <p className="small" style={{ margin: 0 }}>
+            Contact record with linked projects and cards.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => navigate(-1)} className="btn btn-light">
             ← Back
           </button>
           <button
@@ -55,8 +61,6 @@ export default function ClientView() {
           >
             + Create Card
           </button>
-        </div>
-        <div className="flex gap-2">
           <button
             onClick={() => navigate(`/office/client/${client.id}/edit`)}
             className="btn btn-light"
@@ -74,13 +78,14 @@ export default function ClientView() {
       </div>
 
       {/* CLIENT INFO */}
-      <div className="card space-y-2">
-        <h1 style={{ margin: 0 }}>{client.name}</h1>
-        <div><strong>Phone:</strong> {client.phone || "—"}</div>
-        <div><strong>Email:</strong> {client.email || "—"}</div>
-        <div><strong>Address:</strong> {client.address || "—"}</div>
-        <div><strong>Notes:</strong> {client.notes || "—"}</div>
-        <div className="text-sm" style={{ color: "#64748b" }}>
+      <div className="card">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 12 }}>
+          <InfoItem label="Phone" value={client.phone} />
+          <InfoItem label="Email" value={client.email} />
+          <InfoItem label="Address" value={client.address} />
+          <InfoItem label="Notes" value={client.notes} />
+        </div>
+        <div className="text-sm" style={{ color: "#64748b", marginTop: 10 }}>
           Created: {client.created_at ? new Date(client.created_at).toLocaleString() : "—"}
         </div>
       </div>
@@ -91,9 +96,9 @@ export default function ClientView() {
           <h2 style={{ margin: 0 }}>Projects</h2>
           <button
             className="btn btn-light"
-            onClick={() => navigate(`/office/project/new?client=${client.id}`)}
+            onClick={() => navigate(`/office/create-card?client=${client.id}`)}
           >
-            + Add Project
+            + Create Card
           </button>
         </div>
 
@@ -117,6 +122,15 @@ export default function ClientView() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function InfoItem({ label, value }) {
+  return (
+    <div style={{ padding: 10, border: "1px solid var(--border)", borderRadius: "10px", background: "white" }}>
+      <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 15, color: "#0f172a" }}>{value || "—"}</div>
     </div>
   );
 }
