@@ -7,6 +7,8 @@ export default function Projects() {
   const [clients, setClients] = useState([]);
   const [newName, setNewName] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     load();
@@ -17,6 +19,7 @@ export default function Projects() {
     const c = await api.get("/clients");
     setProjects(p.data);
     setClients(c.data);
+    setPage(1);
   }
 
   async function addProject() {
@@ -43,6 +46,9 @@ export default function Projects() {
   if (localStorage.getItem("role") !== "Owner") {
     return <Navigate to="/login" replace />;
   }
+
+  const totalPages = Math.max(1, Math.ceil(projects.length / pageSize));
+  const pageData = projects.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="page">
@@ -78,11 +84,12 @@ export default function Projects() {
             <tr>
               <th>Project Name</th>
               <th>Client</th>
+              <th>Rename</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {projects.map(p => (
+            {pageData.map(p => (
               <tr key={p.id}>
                 <td>
                   <Link to={`/office/project/${p.id}`}>{p.name}</Link>
@@ -97,21 +104,41 @@ export default function Projects() {
                         {c.name}
                       </option>
                     ))}
-                  </select>
-                </td>
-                <td>
-                  <input
-                    value={p.name}
-                    onChange={e => updateProject(p.id, "name", e.target.value)}
+                    </select>
+                  </td>
+                  <td>
+                    <input
+                      value={p.name}
+                      onChange={e => updateProject(p.id, "name", e.target.value)}
                   />
-                </td>
-                <td>
-                  <button onClick={() => deleteProject(p.id)}>Delete</button>
-                </td>
-              </tr>
+                  </td>
+                  <td>
+                    <button onClick={() => deleteProject(p.id)}>Delete</button>
+                  </td>
+                </tr>
             ))}
           </tbody>
         </table>
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+          <button
+            className="btn btn-light"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+          <div style={{ alignSelf: "center" }}>
+            Page {page} / {totalPages}
+          </div>
+          <button
+            className="btn btn-light"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

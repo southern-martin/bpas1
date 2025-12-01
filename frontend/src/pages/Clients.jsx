@@ -11,6 +11,8 @@ export default function Clients() {
     address: "",
     notes: ""
   });
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     load();
@@ -19,6 +21,7 @@ export default function Clients() {
   async function load() {
     const res = await api.get("/clients");
     setClients(res.data);
+    setPage(1);
   }
 
   async function addClient() {
@@ -54,6 +57,9 @@ export default function Clients() {
     window.__toast?.info?.("Client deleted");
     load();
   }
+
+  const totalPages = Math.max(1, Math.ceil(clients.length / pageSize));
+  const pageData = clients.slice((page - 1) * pageSize, page * pageSize);
 
   if (localStorage.getItem("role") !== "Owner") {
     return <Navigate to="/login" replace />;
@@ -115,7 +121,7 @@ export default function Clients() {
             </tr>
           </thead>
           <tbody>
-            {clients.map(c => (
+            {pageData.map(c => (
               <tr key={c.id}>
                 <td>
                   <Link to={`/office/client/${c.id}`}>{c.name}</Link>
@@ -153,6 +159,26 @@ export default function Clients() {
             ))}
           </tbody>
         </table>
+
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+          <button
+            className="btn btn-light"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Prev
+          </button>
+          <div style={{ alignSelf: "center" }}>
+            Page {page} / {totalPages}
+          </div>
+          <button
+            className="btn btn-light"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
