@@ -8,7 +8,8 @@ import {
   upsertProjects,
   getQueueCount
 } from "../offline/db.js";
-import { initSyncLoop, processQueue } from "../offline/sync.js";
+import { initSyncLoop, runSync } from "../offline/sync.js";
+import { useSyncStatus } from "../offline/syncStatus.js";
 
 export default function FieldToday() {
   const [events, setEvents] = useState([]);
@@ -17,9 +18,7 @@ export default function FieldToday() {
   const [showInstall, setShowInstall] = useState(false);
   const [offline, setOffline] = useState(!navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
-  const [lastSync, setLastSync] = useState(
-    localStorage.getItem("lastSync")
-  );
+  const { status, lastSync } = useSyncStatus();
   const staffId = localStorage.getItem("userId") || "staff-1";
 
   useEffect(() => {
@@ -76,12 +75,8 @@ export default function FieldToday() {
   }
 
   async function handleSyncNow() {
-    const synced = await processQueue();
+    await runSync();
     updateQueueCount();
-    if (synced > 0) {
-      const ts = localStorage.getItem("lastSync");
-      setLastSync(ts);
-    }
   }
 
   if (localStorage.getItem("role") !== "Staff") {
