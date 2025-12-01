@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Navigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
+import { useToast } from "../components/ToastProvider.jsx";
 
 export default function CreateCard() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const toast = useToast();
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Task");
@@ -77,6 +79,7 @@ export default function CreateCard() {
       });
     }
 
+    toast.success("Card created");
     navigate(`/office/card/${newCardId}`);
   }
 

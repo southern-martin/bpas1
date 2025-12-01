@@ -167,6 +167,29 @@ a:hover {
   text-decoration: underline;
 }
 
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  gap: 8px;
+  z-index: 2000;
+}
+
+.toast {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text-primary);
+  min-width: 220px;
+}
+
+.toast-success { border-color: #bbf7d0; background: #ecfdf3; color: #166534; }
+.toast-error { border-color: #fecdd3; background: #fef2f2; color: #991b1b; }
+.toast-info { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
+
 /* Field mobile styles */
 .field-container {
   padding: 16px;
