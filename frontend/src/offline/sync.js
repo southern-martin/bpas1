@@ -1,5 +1,6 @@
 import { api } from "../api/client.js";
 import { getQueue, removeQueue } from "./db.js";
+import { useSyncStatus } from "./syncStatus.js";
 
 export async function processQueue() {
   if (!navigator.onLine) return 0;
@@ -76,6 +77,19 @@ async function sendToServer(item) {
 export function initSyncLoop() {
   window.addEventListener("online", () => processQueue());
   setInterval(() => processQueue(), 15000);
+}
+
+export async function runSync() {
+  const { setStatus, setLastSync } = useSyncStatus.getState();
+  setStatus("syncing");
+  try {
+    await processQueue();
+    setStatus("ok");
+    setLastSync(Date.now());
+  } catch (err) {
+    console.error("Sync error", err);
+    setStatus("error");
+  }
 }
 
 function dataUrlToBlob(dataUrl) {

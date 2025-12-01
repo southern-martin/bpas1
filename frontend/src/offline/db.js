@@ -16,11 +16,24 @@ export async function enqueue(item) {
   return db.queue.put({ ...item, timestamp: item.timestamp || Date.now() });
 }
 
+// Generic queue helper (alias)
+export async function queueAction(action) {
+  return db.queue.add({ ...action, timestamp: Date.now() });
+}
+
 export async function getQueue() {
   return db.queue.orderBy("timestamp").toArray();
 }
 
+export async function getQueuedActions() {
+  return db.queue.toArray();
+}
+
 export async function removeQueue(id) {
+  return db.queue.delete(id);
+}
+
+export async function removeQueueAction(id) {
   return db.queue.delete(id);
 }
 
