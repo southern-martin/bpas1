@@ -71,52 +71,60 @@ export default function OfficePipeline() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Pipeline Board</h1>
-      <div style={{ marginBottom: 10 }}>
-        <Link to="/office/create-card">+ Create Card</Link>
+    <div className="page">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ margin: 0 }}>Pipeline Board</h1>
+          <p style={{ margin: 0, color: "#6b7280" }}>Drag cards to move status. Filter by client/project or search.</p>
+        </div>
+        <Link className="btn btn-primary" to="/office/create-card">
+          + Create Card
+        </Link>
       </div>
 
-      <div className="filter-bar">
-        <input
-          type="text"
-          placeholder="Search cards..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
+      <div className="card">
+        <div className="filter-bar">
+          <input
+            type="text"
+            placeholder="Search cards..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
 
-        <select value={clientFilter} onChange={e => setClientFilter(e.target.value)}>
-          <option value="">All Clients</option>
-          {clients.map(c => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          <select value={clientFilter} onChange={e => setClientFilter(e.target.value)}>
+            <option value="">All Clients</option>
+            {clients.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={projectFilter}
-          onChange={e => setProjectFilter(e.target.value)}
-          style={{ marginLeft: 10 }}
-        >
-          <option value="">All Projects</option>
-          {projects.map(p => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+          <select
+            value={projectFilter}
+            onChange={e => setProjectFilter(e.target.value)}
+            style={{ marginLeft: 10 }}
+          >
+            <option value="">All Projects</option>
+            {projects.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
 
-        <button
-          onClick={() => {
-            setClientFilter("");
-            setProjectFilter("");
-          }}
-          style={{ marginLeft: 10 }}
-        >
-          Clear Filters
-        </button>
+          <button
+            onClick={() => {
+              setClientFilter("");
+              setProjectFilter("");
+              setSearchTerm("");
+            }}
+            style={{ marginLeft: 10 }}
+          >
+            Clear
+          </button>
+        </div>
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
