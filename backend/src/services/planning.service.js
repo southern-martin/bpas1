@@ -9,8 +9,10 @@ export async function getPlanning() {
 }
 
 export async function updatePlanning(cardId, planningBucket) {
+  const exists = await prisma.card.findUnique({ where: { id: cardId } });
+  if (!exists) return null;
   return prisma.card.update({
     where: { id: cardId },
-    data: { planning_bucket: planningBucket }
+    data: { planning_bucket: planningBucket ?? null }
   });
 }
