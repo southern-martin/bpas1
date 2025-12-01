@@ -51,9 +51,13 @@ export default function OfficePipeline() {
 
     const newStatus = statusMap[destination.droppableId];
 
-    await api.patch(`/cards/${draggableId}`, { status: newStatus });
-
-    loadPipeline();
+    try {
+      await api.patch(`/cards/${draggableId}`, { status: newStatus });
+      window.__toast?.success?.(`Moved to ${newStatus}`);
+      loadPipeline();
+    } catch (err) {
+      window.__toast?.error?.("Move failed");
+    }
   }
 
   function filterCards(cards) {

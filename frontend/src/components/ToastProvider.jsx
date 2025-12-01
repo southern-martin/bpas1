@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useCallback } from "react";
+import { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
 
 const ToastContext = createContext(null);
 
@@ -24,6 +24,14 @@ export function ToastProvider({ children }) {
     }),
     [add]
   );
+
+  useEffect(() => {
+    // Expose a global helper for non-React modules (e.g., axios interceptors)
+    window.__toast = value;
+    return () => {
+      window.__toast = null;
+    };
+  }, [value]);
 
   return (
     <ToastContext.Provider value={value}>
