@@ -36,19 +36,21 @@ export default function OwnerDashboard() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Owner Dashboard</h1>
+    <div className="page">
+      <h1 style={{ marginBottom: 12 }}>Owner Dashboard</h1>
 
-      <div className="stats-row">
-        <StatBox label="Total Cards" value={cards.length} />
-        <StatBox label="To Do" value={count("To Do")} />
-        <StatBox label="Doing" value={count("Doing")} />
-        <StatBox label="Done" value={count("Done")} />
-        <StatBox label="Blocked" value={count("Blocked")} />
+      <div className="card">
+        <div className="stats-row">
+          <StatBox label="Total Cards" value={cards.length} />
+          <StatBox label="To Do" value={count("To Do")} />
+          <StatBox label="Doing" value={count("Doing")} />
+          <StatBox label="Done" value={count("Done")} />
+          <StatBox label="Blocked" value={count("Blocked")} />
+        </div>
       </div>
 
-      <div style={{ marginTop: 30 }}>
-        <h2>Today's Events</h2>
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Today's Events</h2>
         {todayEvents.length === 0 && <p>No events today.</p>}
         {todayEvents.map(evt => (
           <div key={evt.id} className="dash-card">
@@ -59,8 +61,8 @@ export default function OwnerDashboard() {
         ))}
       </div>
 
-      <div style={{ marginTop: 30 }}>
-        <h2>Workload by Staff</h2>
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Workload by Staff</h2>
         {Object.keys(staffMap).length === 0 && <p>No staff workload.</p>}
         {Object.entries(staffMap).map(([id, count]) => (
           <div key={id} className="dash-line">
@@ -69,8 +71,8 @@ export default function OwnerDashboard() {
         ))}
       </div>
 
-      <div style={{ marginTop: 30 }}>
-        <h2>Recent Activity</h2>
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Recent Activity</h2>
         {activities.length === 0 && <p>No activity yet.</p>}
         {activities.map(a => (
           <div key={a.id} className="dash-card">
@@ -83,8 +85,8 @@ export default function OwnerDashboard() {
         ))}
       </div>
 
-      <div style={{ marginTop: 30 }}>
-        <h2>Quick Actions</h2>
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>Quick Actions</h2>
         <div className="quick-buttons">
           <Link className="quick-btn" to="/office/create-card">
             + Create Card
