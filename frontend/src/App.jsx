@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import FieldToday from "./pages/FieldToday.jsx";
 import FieldCard from "./pages/FieldCard.jsx";
 import OfficePipeline from "./pages/OfficePipeline.jsx";
@@ -49,7 +49,7 @@ export default function App() {
       </nav>
 
       <Routes>
-        <Route path="/" element={<FieldToday />} />
+        <Route path="/" element={<HomeRedirect />} />
         <Route path="/field/today" element={<FieldToday />} />
         <Route path="/field/card/:id" element={<FieldCard />} />
 
@@ -138,4 +138,11 @@ export default function App() {
       </Routes>
     </>
   );
+}
+
+function HomeRedirect() {
+  const role = localStorage.getItem("role");
+  if (role === "Staff") return <Navigate to="/field/today" replace />;
+  if (role === "Owner") return <Navigate to="/office/dashboard" replace />;
+  return <Navigate to="/login" replace />;
 }
