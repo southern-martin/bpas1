@@ -57,96 +57,100 @@ export default function Clients() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Clients</h1>
-
-      <div className="card" style={{ marginBottom: 20 }}>
-        <h2 style={{ marginTop: 0 }}>Create New Client</h2>
-        <div style={{ display: "grid", gap: 8 }}>
-          <input
-            placeholder="Name *"
-            value={newClient.name}
-            onChange={e => setNewClient({ ...newClient, name: e.target.value })}
-            required
-          />
-          <input
-            placeholder="Phone"
-            value={newClient.phone}
-            onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
-          />
-          <input
-            placeholder="Email"
-            type="email"
-            value={newClient.email}
-            onChange={e => setNewClient({ ...newClient, email: e.target.value })}
-          />
-          <input
-            placeholder="Address"
-            value={newClient.address}
-            onChange={e => setNewClient({ ...newClient, address: e.target.value })}
-          />
-          <textarea
-            placeholder="Notes"
-            value={newClient.notes}
-            onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
-            rows={3}
-          />
-          <button onClick={addClient} style={{ marginTop: 8 }}>
-            Add Client
-          </button>
+    <div className="page">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ margin: 0 }}>Clients</h1>
+          <p className="small">Store full contact details for every client.</p>
         </div>
+        <button className="btn btn-primary" onClick={addClient}>
+          + Add Client
+        </button>
       </div>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Client Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Address</th>
-            <th>Notes</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clients.map(c => (
-            <tr key={c.id}>
-              <td>
-                <Link to={`/office/client/${c.id}`}>{c.name}</Link>
-              </td>
-              <td>
-                <input
-                  value={c.phone || ""}
-                  onChange={e => handleEdit(c.id, "phone", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  value={c.email || ""}
-                  onChange={e => handleEdit(c.id, "email", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  value={c.address || ""}
-                  onChange={e => handleEdit(c.id, "address", e.target.value)}
-                />
-              </td>
-              <td>
-                <textarea
-                  value={c.notes || ""}
-                  onChange={e => handleEdit(c.id, "notes", e.target.value)}
-                  rows={2}
-                />
-              </td>
-              <td style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                <button onClick={() => saveClient(c.id)}>Save</button>
-                <button onClick={() => deleteClient(c.id)}>Delete</button>
-              </td>
+      <div className="card" style={{ display: "grid", gap: 8 }}>
+        <input
+          placeholder="Name *"
+          value={newClient.name}
+          onChange={e => setNewClient({ ...newClient, name: e.target.value })}
+          required
+        />
+        <input
+          placeholder="Phone"
+          value={newClient.phone}
+          onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
+        />
+        <input
+          placeholder="Email"
+          type="email"
+          value={newClient.email}
+          onChange={e => setNewClient({ ...newClient, email: e.target.value })}
+        />
+        <input
+          placeholder="Address"
+          value={newClient.address}
+          onChange={e => setNewClient({ ...newClient, address: e.target.value })}
+        />
+        <textarea
+          placeholder="Notes"
+          value={newClient.notes}
+          onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
+          rows={3}
+        />
+      </div>
+
+      <div className="card">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Notes</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {clients.map(c => (
+              <tr key={c.id}>
+                <td>
+                  <Link to={`/office/client/${c.id}`}>{c.name}</Link>
+                </td>
+                <td>
+                  <input
+                    value={c.phone || ""}
+                    onChange={e => handleEdit(c.id, "phone", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={c.email || ""}
+                    onChange={e => handleEdit(c.id, "email", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <input
+                    value={c.address || ""}
+                    onChange={e => handleEdit(c.id, "address", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <textarea
+                    value={c.notes || ""}
+                    onChange={e => handleEdit(c.id, "notes", e.target.value)}
+                    rows={2}
+                  />
+                </td>
+                <td style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <button onClick={() => saveClient(c.id)}>Save</button>
+                  <button onClick={() => deleteClient(c.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

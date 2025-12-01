@@ -34,14 +34,18 @@ export default function OwnerPlanning() {
     cards.filter(c => c.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Owner Planning</h1>
-      <p className="small">Arrange cards into Tomorrow, Next Week, and Later.</p>
-      <div style={{ marginBottom: 10 }}>
-        <Link to="/office/create-card">+ Create Card</Link>
+    <div className="page">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ margin: 0 }}>Owner Planning</h1>
+          <p className="small">Arrange cards into Tomorrow, Next Week, and Later.</p>
+        </div>
+        <Link className="btn btn-primary" to="/office/create-card">
+          + Create Card
+        </Link>
       </div>
 
-      <div style={{ marginBottom: 12 }}>
+      <div className="card">
         <input
           type="text"
           placeholder="Search cards..."

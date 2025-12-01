@@ -42,10 +42,18 @@ export default function Projects() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Projects</h1>
+    <div className="page">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ margin: 0 }}>Projects</h1>
+          <p className="small">Manage projects and link them to clients.</p>
+        </div>
+        <button className="btn btn-primary" onClick={addProject}>
+          + Add Project
+        </button>
+      </div>
 
-      <div style={{ marginBottom: 20 }}>
+      <div className="card" style={{ display: "grid", gap: 8 }}>
         <input
           placeholder="New project name"
           value={newName}
@@ -59,50 +67,49 @@ export default function Projects() {
             </option>
           ))}
         </select>
-        <button onClick={addProject} style={{ marginLeft: 8 }}>
-          Add
-        </button>
       </div>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Project Name</th>
-            <th>Client</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map(p => (
-            <tr key={p.id}>
-              <td>
-                <Link to={`/office/project/${p.id}`}>{p.name}</Link>
-              </td>
-              <td>
-                <select
-                  value={p.client_id}
-                  onChange={e => updateProject(p.id, "client_id", e.target.value)}
-                >
-                  {clients.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <input
-                  value={p.name}
-                  onChange={e => updateProject(p.id, "name", e.target.value)}
-                />
-              </td>
-              <td>
-                <button onClick={() => deleteProject(p.id)}>Delete</button>
-              </td>
+      <div className="card">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Project Name</th>
+              <th>Client</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {projects.map(p => (
+              <tr key={p.id}>
+                <td>
+                  <Link to={`/office/project/${p.id}`}>{p.name}</Link>
+                </td>
+                <td>
+                  <select
+                    value={p.client_id}
+                    onChange={e => updateProject(p.id, "client_id", e.target.value)}
+                  >
+                    {clients.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <input
+                    value={p.name}
+                    onChange={e => updateProject(p.id, "name", e.target.value)}
+                  />
+                </td>
+                <td>
+                  <button onClick={() => deleteProject(p.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

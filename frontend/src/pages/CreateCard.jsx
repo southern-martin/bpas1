@@ -107,12 +107,17 @@ export default function CreateCard() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <button onClick={() => navigate(-1)}>← Back</button>
-      <h1 style={{ marginTop: 10 }}>Create New Card</h1>
+    <div className="page">
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => navigate(-1)} className="btn btn-light">
+          ← Back
+        </button>
+        <h1 style={{ margin: 0 }}>Create New Card</h1>
+        <div />
+      </div>
 
-      <div className="ai-box">
-        <h2>AI Create (Optional)</h2>
+      <div className="card ai-box">
+        <h2 style={{ marginTop: 0 }}>AI Create (Optional)</h2>
         <textarea
           className="ai-input"
           placeholder="Describe the task or event..."
@@ -124,7 +129,7 @@ export default function CreateCard() {
         </button>
       </div>
 
-      <div style={{ marginTop: 20, display: "grid", gap: 12 }}>
+      <div className="card" style={{ display: "grid", gap: 12 }}>
         <label>
           Card Type
           <select value={type} onChange={e => setType(e.target.value)} style={{ display: "block", marginTop: 6 }}>
@@ -136,7 +141,7 @@ export default function CreateCard() {
         <label>
           Title
           <input
-            style={{ width: "100%", padding: 8, marginTop: 6 }}
+            style={{ width: "100%", padding: 10, marginTop: 6 }}
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Card title"
@@ -217,16 +222,15 @@ export default function CreateCard() {
         </label>
       </div>
 
-      <button
-        onClick={handleCreate}
-        style={{
-          marginTop: 20,
-          padding: "10px 20px",
-          fontSize: 16
-        }}
-      >
-        Create Card
-      </button>
+      <div className="card" style={{ textAlign: "right" }}>
+        <button
+          onClick={handleCreate}
+          className="btn btn-primary"
+          style={{ paddingLeft: 20, paddingRight: 20 }}
+        >
+          Create Card
+        </button>
+      </div>
     </div>
   );
 }
