@@ -44,7 +44,7 @@ export default function ClientView() {
   return (
     <div className="page space-y-6 max-w-3xl">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-2">
         <div>
           <button onClick={() => navigate(-1)} className="btn btn-light" style={{ marginRight: 8 }}>
             ← Back
@@ -56,9 +56,21 @@ export default function ClientView() {
             + Create Card
           </button>
         </div>
-        <button onClick={deleteClient} className="btn btn-light" style={{ background: "#fee2e2", color: "#991b1b" }}>
-          Delete
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/office/client/${client.id}/edit`)}
+            className="btn btn-light"
+          >
+            Edit
+          </button>
+          <button
+            onClick={deleteClient}
+            className="btn btn-light"
+            style={{ background: "#fee2e2", color: "#991b1b" }}
+          >
+            Delete
+          </button>
+        </div>
       </div>
 
       {/* CLIENT INFO */}
