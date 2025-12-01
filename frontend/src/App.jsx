@@ -17,13 +17,15 @@ import ClientEdit from "./pages/ClientEdit.jsx";
 
 export default function App() {
   const isAuthed = Boolean(localStorage.getItem("token"));
+  const role = localStorage.getItem("role");
+  const isStaff = role === "Staff";
 
   return (
     <>
       <nav className="top-nav">
         <div className="top-nav-brand">BPAS</div>
         <div className="top-nav-links">
-          <Link to="/field/today">Field</Link>
+          {isStaff && <Link to="/field/today">Field</Link>}
           <Link to="/office/dashboard">Dashboard</Link>
           <Link to="/office/pipeline">Pipeline</Link>
           <Link to="/office/planning">Planning</Link>
