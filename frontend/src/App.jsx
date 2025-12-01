@@ -21,25 +21,29 @@ export default function App() {
   return (
     <>
       <nav className="top-nav">
-        <Link to="/field/today">Field Today</Link>
-        <Link to="/office/pipeline">Pipeline</Link>
-        <Link to="/office/planning">Planning</Link>
-        <Link to="/office/clients">Clients</Link>
-        <Link to="/office/projects">Projects</Link>
-        <Link to="/office/create-card">Create Card</Link>
-        {isAuthed && (
-          <button
-            className="logout-btn"
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("role");
-              localStorage.removeItem("userId");
-              window.location.href = "/login";
-            }}
-          >
-            Logout
-          </button>
-        )}
+        <div className="top-nav-brand">BPAS</div>
+        <div className="top-nav-links">
+          <Link to="/field/today">Field</Link>
+          <Link to="/office/dashboard">Dashboard</Link>
+          <Link to="/office/pipeline">Pipeline</Link>
+          <Link to="/office/planning">Planning</Link>
+        </div>
+        <div className="top-nav-actions">
+          <Link to="/office/create-card">Create Card</Link>
+          {isAuthed && (
+            <button
+              className="logout-btn"
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                localStorage.removeItem("userId");
+                window.location.href = "/login";
+              }}
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </nav>
 
       <Routes>

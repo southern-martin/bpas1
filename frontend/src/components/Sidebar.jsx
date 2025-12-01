@@ -15,15 +15,17 @@ export default function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-title">BPAS Office</div>
-      {menu.map(m => (
-        <Link
-          key={m.path}
-          to={m.path}
-          className={`sidebar-item ${pathname === m.path ? "active" : ""}`}
-        >
-          {m.label}
-        </Link>
-      ))}
+      <div className="sidebar-links">
+        {menu.map(m => (
+          <Link
+            key={m.path}
+            to={m.path}
+            className={`sidebar-item ${pathname === m.path ? "active" : ""}`}
+          >
+            {m.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
