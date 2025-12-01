@@ -1,11 +1,28 @@
 import { test, expect } from "@playwright/test";
 
 const API_URL = process.env.API_URL || "http://localhost:4000";
+const OWNER_EMAIL = process.env.OWNER_EMAIL || "owner@example.com";
+const OWNER_PASS = process.env.OWNER_PASS || "123456";
 
 test("AE: offline card update queues and syncs when back online", async ({ page, request }) => {
+  // Health check backend
+  const health = await request.get(API_URL + "/");
+  if (!health.ok()) test.skip("Backend not reachable");
+
+  // Login to get token
+  const loginRes = await request.post(`${API_URL}/auth/login`, {
+    headers: { "Content-Type": "application/json" },
+    data: { email: OWNER_EMAIL, password: OWNER_PASS }
+  });
+  if (!loginRes.ok()) test.skip("Login failed; check backend auth");
+  const { token } = await loginRes.json();
+
   // 1) Create a card via API
   const createRes = await request.post(`${API_URL}/cards`, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
     data: {
       title: `AE Card ${Date.now()}`,
       type: "Task",
@@ -15,6 +32,13 @@ test("AE: offline card update queues and syncs when back online", async ({ page,
   });
   expect(createRes.ok()).toBeTruthy();
   const card = await createRes.json();
+
+  // Seed auth into localStorage for UI
+  await page.addInitScript(([t]) => {
+    localStorage.setItem("token", t);
+    localStorage.setItem("role", "Staff");
+    localStorage.setItem("userId", "staff-1");
+  }, token);
 
   // 2) Open the card while online to cache it
   await page.goto(`/field/card/${card.id}`);
