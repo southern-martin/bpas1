@@ -18,3 +18,7 @@ backend/uploads
 
 # Prisma artifacts
 backend/prisma/dev.db
+
+# Lockfiles (ignore globally)
+package-lock.json
+**/package-lock.json
