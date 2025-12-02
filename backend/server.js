@@ -10,7 +10,7 @@ import clientsRoutes from "./src/infrastructure/http/routes/clients.routes.js";
 import projectsRoutes from "./src/infrastructure/http/routes/projects.routes.js";
 import usersRoutes from "./src/infrastructure/http/routes/users.routes.js";
 import authRoutes from "./src/infrastructure/http/routes/auth.routes.js";
-import activitiesRoutes from "./src/routes/activities.routes.js";
+import activitiesRoutes from "./src/infrastructure/http/routes/activities.routes.js";
 import aiCardRoutes from "./src/infrastructure/http/routes/aiCard.routes.js";
 import syncRoutes from "./src/infrastructure/http/routes/sync.routes.js";
 import { requireAuth, requireOwner } from "./src/middleware/auth.js";

@@ -1,4 +1,4 @@
-import { verifyToken } from "../../utils/token.js";
+import { verifyToken } from "../../../utils/token.js";
 
 export class GetCurrentUser {
   async execute(token) {

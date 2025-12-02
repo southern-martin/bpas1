@@ -45,6 +45,9 @@ import { ClarifyText } from "../application/usecases/clarify/ClarifyText.js";
 import { ClarifyController } from "../infrastructure/http/controllers/ClarifyController.js";
 import { ProcessSyncQueue } from "../application/usecases/sync/ProcessSyncQueue.js";
 import { SyncController } from "../infrastructure/http/controllers/SyncController.js";
+import { PrismaActivityRepository } from "../infrastructure/repositories/PrismaActivityRepository.js";
+import { GetRecentActivities } from "../application/usecases/activities/GetRecentActivities.js";
+import { ActivityController } from "../infrastructure/http/controllers/ActivityController.js";
 
 const clientRepository = new PrismaClientRepository(prisma);
 const cardRepository = new PrismaCardRepository(prisma);
@@ -53,6 +56,7 @@ const userRepository = new PrismaUserRepository(prisma);
 const audioTranscriber = new WhisperAudioTranscriber();
 const cardPrefillAI = new BpasCardPrefillAI();
 const clarifier = new BpasClarifier();
+const activityRepository = new PrismaActivityRepository(prisma);
 
 const createClient = new CreateClient(clientRepository);
 const getClients = new GetClients(clientRepository);
@@ -132,6 +136,9 @@ const clarifyController = new ClarifyController({ clarifyText });
 const processSyncQueue = new ProcessSyncQueue({ createCard, updateCard, updateCardActivity });
 const syncController = new SyncController({ processSyncQueue });
 
+const getRecentActivities = new GetRecentActivities(activityRepository);
+const activityController = new ActivityController({ getRecentActivities });
+
 export const container = {
   clientController,
   cardController,
@@ -143,5 +150,6 @@ export const container = {
   audioController,
   aiCardController,
   clarifyController,
-  syncController
+  syncController,
+  activityController
 };

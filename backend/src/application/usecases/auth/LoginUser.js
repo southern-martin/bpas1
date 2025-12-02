@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { generateToken } from "../../utils/token.js";
+import { generateToken } from "../../../utils/token.js";
 
 export class LoginUser {
   constructor(userRepository) {
