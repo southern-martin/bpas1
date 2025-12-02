@@ -1,65 +1,25 @@
-import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { api } from "../api/client.js";
+import { Navigate } from "react-router-dom";
+import {
+  ClientQuickAddForm,
+  ClientsTable,
+  useClients
+} from "../features/clients/index.js";
 
 export default function Clients() {
-  const [clients, setClients] = useState([]);
-  const [newClient, setNewClient] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: "",
-    notes: ""
-  });
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  async function load() {
-    const res = await api.get("/clients");
-    setClients(res.data);
-    setPage(1);
-  }
-
-  async function addClient() {
-    if (!newClient.name.trim()) return;
-    await api.post("/clients", newClient);
-    window.__toast?.success?.("Client added");
-    setNewClient({ name: "", phone: "", email: "", address: "", notes: "" });
-    load();
-  }
-
-  function handleEdit(id, field, value) {
-    setClients(prev =>
-      prev.map(c => (c.id === id ? { ...c, [field]: value } : c))
-    );
-  }
-
-  async function saveClient(id) {
-    const client = clients.find(c => c.id === id);
-    if (!client) return;
-    await api.put(`/clients/${id}`, {
-      name: client.name,
-      phone: client.phone,
-      email: client.email,
-      address: client.address,
-      notes: client.notes
-    });
-    window.__toast?.success?.("Client saved");
-    load();
-  }
-
-  async function deleteClient(id) {
-    await api.delete(`/clients/${id}`);
-    window.__toast?.info?.("Client deleted");
-    load();
-  }
-
-  const totalPages = Math.max(1, Math.ceil(clients.length / pageSize));
-  const pageData = clients.slice((page - 1) * pageSize, page * pageSize);
+  const {
+    clients,
+    newClient,
+    setNewClient,
+    loading,
+    page,
+    totalPages,
+    pageData,
+    setPage,
+    saveNewClient,
+    inlineUpdate,
+    saveInlineClient,
+    removeClient
+  } = useClients();
 
   if (localStorage.getItem("role") !== "Owner") {
     return <Navigate to="/login" replace />;
@@ -72,114 +32,38 @@ export default function Clients() {
           <h1 style={{ margin: 0 }}>Clients</h1>
           <p className="small">Store full contact details for every client.</p>
         </div>
-        <button className="btn btn-primary" onClick={addClient}>
-          + Add Client
-        </button>
       </div>
 
-      <div className="card" style={{ display: "grid", gap: 8 }}>
-        <input
-          placeholder="Name *"
-          value={newClient.name}
-          onChange={e => setNewClient({ ...newClient, name: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Phone"
-          value={newClient.phone}
-          onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
-        />
-        <input
-          placeholder="Email"
-          type="email"
-          value={newClient.email}
-          onChange={e => setNewClient({ ...newClient, email: e.target.value })}
-        />
-        <input
-          placeholder="Address"
-          value={newClient.address}
-          onChange={e => setNewClient({ ...newClient, address: e.target.value })}
-        />
-        <textarea
-          placeholder="Notes"
-          value={newClient.notes}
-          onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
-          rows={3}
-        />
-      </div>
+      <ClientQuickAddForm value={newClient} onChange={setNewClient} onSubmit={saveNewClient} />
 
-      <div className="card">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Client Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Address</th>
-              <th>Notes</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageData.map(c => (
-              <tr key={c.id}>
-                <td>
-                  <Link to={`/office/client/${c.id}`}>{c.name}</Link>
-                </td>
-                <td>
-                  <input
-                    value={c.phone || ""}
-                    onChange={e => handleEdit(c.id, "phone", e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    value={c.email || ""}
-                    onChange={e => handleEdit(c.id, "email", e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    value={c.address || ""}
-                    onChange={e => handleEdit(c.id, "address", e.target.value)}
-                  />
-                </td>
-                <td>
-                  <textarea
-                    value={c.notes || ""}
-                    onChange={e => handleEdit(c.id, "notes", e.target.value)}
-                    rows={2}
-                  />
-                </td>
-                <td style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                  <button onClick={() => saveClient(c.id)}>Save</button>
-                  <button onClick={() => deleteClient(c.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {loading ? (
+        <div className="card">Loading...</div>
+      ) : (
+        <>
+          <ClientsTable
+            clients={pageData}
+            onChangeField={inlineUpdate}
+            onSave={saveInlineClient}
+            onDelete={removeClient}
+          />
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
-          <button
-            className="btn btn-light"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            Prev
-          </button>
-          <div style={{ alignSelf: "center" }}>
-            Page {page} / {totalPages}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+            <button className="btn btn-light" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+              Prev
+            </button>
+            <div style={{ alignSelf: "center" }}>
+              Page {page} / {totalPages}
+            </div>
+            <button
+              className="btn btn-light"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Next
+            </button>
           </div>
-          <button
-            className="btn btn-light"
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

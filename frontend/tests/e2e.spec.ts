@@ -91,7 +91,7 @@ test("Owner workflow: client -> project -> card -> update -> delete", async ({ p
   });
 
   await page.goto("/office/pipeline");
-  await expect(page.locator("text=Card 1 Updated")).toBeVisible();
+  await expect(page.locator(`text=${card.title} Updated`)).toBeVisible();
 });
 
 async function authHeaderFromPage(page: any) {
