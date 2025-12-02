@@ -1,109 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Navigate, useSearchParams } from "react-router-dom";
-import { api } from "../api/client.js";
 import { useToast } from "../components/ToastProvider.jsx";
+import { useCreateCard } from "../features/cards/index.js";
 
 export default function CreateCard() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const toast = useToast();
 
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("Task");
-  const [clients, setClients] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [staffList, setStaffList] = useState([]);
-  const [clientId, setClientId] = useState("");
-  const [projectId, setProjectId] = useState("");
-  const [assignedTo, setAssignedTo] = useState("");
-  const [eventTime, setEventTime] = useState("");
-  const [notes, setNotes] = useState("");
-  const [plannedBucket, setPlannedBucket] = useState(null);
-  const [aiText, setAiText] = useState("");
-  const [loadingAI, setLoadingAI] = useState(false);
+  const urlParams = {
+    clientId: params.get("client") || "",
+    projectId: params.get("project") || "",
+    plannedBucket: params.get("bucket") || null,
+    assignedTo: params.get("staff") || ""
+  };
 
-  useEffect(() => {
-    async function load() {
-      const [c, p, u] = await Promise.all([
-        api.get("/clients"),
-        api.get("/projects"),
-        api.get("/users")
-      ]);
-      setClients(c.data);
-      setProjects(p.data);
-      setStaffList((u.data || []).filter(user => user.role === "Staff"));
-    }
-    load();
-  }, []);
-
-  useEffect(() => {
-    const clientFromURL = params.get("client");
-    const projectFromURL = params.get("project");
-    const statusFromURL = params.get("status");
-    const bucketFromURL = params.get("bucket");
-    const staffFromURL = params.get("staff");
-
-    if (clientFromURL) setClientId(clientFromURL);
-    if (projectFromURL) setProjectId(projectFromURL);
-    if (statusFromURL) setType(statusFromURL);
-    if (bucketFromURL) setPlannedBucket(bucketFromURL);
-    if (staffFromURL) setAssignedTo(staffFromURL);
-  }, [params]);
-
-  const filteredProjects = useMemo(
-    () => (clientId ? projects.filter(p => p.client_id === clientId) : projects),
-    [projects, clientId]
-  );
-
-  async function handleCreate() {
-    if (!title.trim()) {
-      alert("Title is required.");
-      return;
-    }
-
-    const res = await api.post("/cards", {
+  const {
+    state: {
       title,
       type,
-      linked_client_id: clientId || null,
-      linked_project_id: projectId || null,
-      assigned_to_user_id: assignedTo || null,
-      event_time: type === "Event" ? eventTime || null : null,
-      notes_clarified: notes || ""
-    });
-
-    const newCardId = res.data.id;
-
-    if (plannedBucket) {
-      await api.patch(`/planning/${newCardId}`, {
-        planning_bucket: plannedBucket
-      });
+      clients,
+      projects,
+      staffList,
+      clientId,
+      projectId,
+      assignedTo,
+      eventTime,
+      notes,
+      plannedBucket,
+      aiText,
+      loadingAI,
+      filteredProjects
+    },
+    actions: {
+      setTitle,
+      setType,
+      setClientId,
+      setProjectId,
+      setAssignedTo,
+      setEventTime,
+      setNotes,
+      setPlannedBucket,
+      setAiText,
+      handleCreate,
+      handleAIPrefill
     }
-
-    toast.success("Card created");
-    navigate(`/office/card/${newCardId}`);
-  }
-
-  async function handleAIPrefill() {
-    if (!aiText.trim()) return;
-    setLoadingAI(true);
-    try {
-      const res = await api.post("/ai/prefill-card", { text: aiText });
-      const data = res.data || {};
-      setTitle(data.title || "");
-      setType(data.type || "Task");
-      if (data.client_id) setClientId(data.client_id);
-      if (data.project_id) setProjectId(data.project_id);
-      if (data.assigned_to_user_id) setAssignedTo(data.assigned_to_user_id);
-      setEventTime(data.event_time || "");
-      setNotes(data.notes || "");
-      setPlannedBucket(data.planning_bucket || null);
-    } catch (err) {
-      console.error("AI prefill error", err);
-      alert("AI prefill failed");
-    } finally {
-      setLoadingAI(false);
-    }
-  }
+  } = useCreateCard(urlParams);
 
   if (localStorage.getItem("role") !== "Owner") {
     return <Navigate to="/login" replace />;
@@ -227,9 +168,15 @@ export default function CreateCard() {
 
       <div className="card" style={{ textAlign: "right" }}>
         <button
-          onClick={handleCreate}
           className="btn btn-primary"
           style={{ paddingLeft: 20, paddingRight: 20 }}
+          onClick={async () => {
+            const newCardId = await handleCreate();
+            if (newCardId) {
+              toast.success("Card created");
+              navigate(`/office/card/${newCardId}`);
+            }
+          }}
         >
           Create Card
         </button>
